@@ -13,9 +13,17 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: 'Authenticate with Google Cloud'
-        uses: google-github-actions/auth@v0.4.0
-        with:
-          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
+        - uses: actions/checkout@v2
+        - name: 'Authenticate with Google Cloud'
+          uses: google-github-actions/auth@v0.4.0
+          with:
+            workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+            service_account: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
+        - name: 'Setup Terraform'
+          uses: hashicorp/setup-terraform@v1
+        - name: 'Run Terraform'
+          run: |
+            cd terraform
+            terraform init
+            terraform plan
+            terraform apply -auto-approve

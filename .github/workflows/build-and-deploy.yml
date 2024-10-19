@@ -1,0 +1,95 @@
+name: Build and Deploy Flask App
+
+on:
+  push:
+    # branches:
+    #   - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: 'Authenticate with Google Cloud'
+        uses: google-github-actions/auth@v0.4.0
+        with:
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12'
+
+      - name: "Install dependencies"
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install -r ./api/requirements.txt
+  
+
+      - name: 'Prepare Flask server directory'
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.API_SERVER_IP }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            sudo mkdir -p /opt/flask-app
+            sudo chown -R ${{ secrets.SSH_USERNAME }} /opt/flask-app
+            sudo mkdir -p /var/log/flask-app
+            sudo chown ${{ secrets.SSH_USERNAME }}: /var/log/flask-app
+
+      - name: 'Copy Flask app to server'
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.API_SERVER_IP }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: './api/*'
+          target: '/opt/flask-app'
+          overwrite: true
+          strip_components: 2
+
+      - name: 'Copy kill script to Flask server'
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.API_SERVER_IP }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: './api/scripts/kill.sh'
+          target: '/opt/flask-app'
+          overwrite: true
+          strip_components: 2
+
+      - name: 'Kill existing Flask process'
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.API_SERVER_IP }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            bash /opt/flask-app/kill.sh
+
+      - name: 'Start Flask app using gunicorn'
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.API_SERVER_IP }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /opt/flask-app
+            gunicorn --workers 3 --bind 0.0.0.0:8000 wsgi:app > /var/log/flask-app/flask.log 2>&1 &
+
+      - name: 'Restart Nginx'
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.API_SERVER_IP }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            sudo systemctl restart nginx

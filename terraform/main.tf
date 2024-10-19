@@ -8,6 +8,7 @@ locals {
 
 resource "google_compute_address" "static" {
   name = "api-server-ip"
+  region = var.region
 }
 
 resource "google_compute_instance" "api_server" {

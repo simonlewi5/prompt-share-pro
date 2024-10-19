@@ -25,5 +25,10 @@ jobs:
           run: |
             cd terraform
             terraform init
+            terraform import google_compute_firewall.icmp projects/proverbial-deck-439120-h2/global/firewalls/icmp
+            terraform import google_compute_firewall.http projects/proverbial-deck-439120-h2/global/firewalls/http
+            terraform import google_compute_firewall.ssh projects/proverbial-deck-439120-h2/global/firewalls/ssh
+            terraform import google_compute_address.static projects/proverbial-deck-439120-h2/regions/us-west1/addresses/api-server-ip
+            terraform import google_compute_instance.api_server projects/proverbial-deck-439120-h2/zones/us-west1-a/instances/api-server
             terraform plan
             terraform apply -auto-approve

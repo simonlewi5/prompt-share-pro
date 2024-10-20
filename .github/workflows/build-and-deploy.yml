@@ -28,6 +28,7 @@ jobs:
           script: |
             sudo apt update
             sudo apt install -y python3.12 python3.12-venv python3-pip
+            sudo rm -rf /opt/flask-app
             sudo mkdir -p /opt/flask-app
             sudo chown -R ${{ secrets.SSH_USERNAME }} /opt/flask-app
             sudo mkdir -p /var/log/flask-app

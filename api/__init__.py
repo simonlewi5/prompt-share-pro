@@ -7,8 +7,6 @@ from flask_jwt_extended import JWTManager
 from google.cloud import firestore
 from api.routes.auth import auth_bp
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 db = firestore.Client()
 
 def create_app(config_object='api.config.Config'):
@@ -18,17 +16,20 @@ def create_app(config_object='api.config.Config'):
     app = Flask(__name__)
     app.config.from_object(config_object)
 
-    logger.info("Current app before JWT: %s", app)
+    # Set up logging
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
 
+    app.logger.info("Current app before JWT initialization")
+    
     jwt = JWTManager(app)
-
-    logger.info("Current app after JWT, before blueprint registered: %s", app)
+    
+    app.logger.info("Current app after JWT initialization, before blueprint registered")
 
     app.register_blueprint(auth_bp)
-
-    logger.info("Current app after blueprint registered: %s", app)
-
-    # Register other blueprints and routes
+    
+    app.logger.info("Current app after blueprint registered")
 
     @app.route("/")
     def home():

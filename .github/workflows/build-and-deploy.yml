@@ -42,7 +42,7 @@ jobs:
           source: './api/*'
           target: '/opt/flask-app'
           overwrite: true
-          strip_components: 2
+          strip_components: 1
 
       - name: 'Install Python dependencies on server'
         uses: appleboy/ssh-action@master

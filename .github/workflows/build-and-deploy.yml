@@ -42,7 +42,7 @@ jobs:
           source: "./api/*"
           target: "/opt/flask-app"
           overwrite: true
-          strip_components: 1
+          # strip_components: 1
 
       - name: "Install Python dependencies on server"
         uses: appleboy/ssh-action@master
@@ -51,11 +51,11 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /opt/flask-app
+            cd /opt/flask-app/
             python3.12 -m venv venv
             source venv/bin/activate
             pip install --upgrade pip
-            pip install -r requirements.txt
+            pip install -r api/requirements.txt
 
       - name: "Set GOOGLE_APPLICATION_CREDENTIALS"
         run: |
@@ -69,7 +69,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            bash /opt/flask-app/scripts/kill.sh
+            bash /opt/flask-app/api/scripts/kill.sh
 
       - name: "Start Flask app using gunicorn"
         uses: appleboy/ssh-action@master

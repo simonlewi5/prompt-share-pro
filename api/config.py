@@ -18,7 +18,5 @@ class Config:
         return "Config()"
 
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'secret-key')
-    DEBUG = False
-    TESTING = False
 
 config = Config()

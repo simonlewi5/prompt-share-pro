@@ -1,35 +1,39 @@
 """
 Initialize the Flask application and other extensions like JWT and Firestore
 """
+import os
 import logging
 from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from google.cloud import firestore
+from dotenv import load_dotenv
 from api.routes.auth import auth_bp
 
+load_dotenv()
 db = firestore.Client()
 
-def create_app(config_object='api.config.Config'):
+def create_app():
     """
-    Create a Flask app using the provided configuration object
+    Create a Flask app and configure it directly.
     """
     app = Flask(__name__)
-    app.config.from_object(config_object)
+
+    # Directly configure the JWT secret key
+    app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'secret-key')
 
     # Set up logging
-    gunicorn_logger = logging.getLogger('gunicorn.error')
-    app.logger.handlers = gunicorn_logger.handlers
-    app.logger.setLevel(gunicorn_logger.level)
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
 
-    app.logger.info("Current app before JWT initialization")
-    
+    logger.info("Current app before JWT initialization")
+
     jwt = JWTManager(app)
-    
-    app.logger.info("Current app after JWT initialization, before blueprint registered")
+
+    logger.info("Current app after JWT initialization, before blueprint registered")
 
     app.register_blueprint(auth_bp)
-    
-    app.logger.info("Current app after blueprint registered")
+
+    logger.info("Current app after blueprint registered")
 
     @app.route("/")
     def home():

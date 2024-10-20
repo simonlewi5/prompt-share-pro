@@ -7,7 +7,7 @@ Authentication routes
 from flask import Blueprint, request, jsonify, current_app
 from google.cloud import firestore
 from google.api_core.exceptions import GoogleAPICallError, NotFound, AlreadyExists
-from flask_jwt_extended import create_access_token, get_jwt_manager
+from flask_jwt_extended import create_access_token
 from api.models.user import User
 from api.utils.validators import is_valid_usc_email, is_valid_usc_id
 

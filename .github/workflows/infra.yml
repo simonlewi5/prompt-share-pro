@@ -13,22 +13,22 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     steps:
-        - uses: actions/checkout@v2
-        - name: 'Authenticate with Google Cloud'
-          uses: google-github-actions/auth@v0.4.0
-          with:
-            workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
-            service_account: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
-        - name: 'Setup Terraform'
-          uses: hashicorp/setup-terraform@v1
-        - name: 'Run Terraform'
-          run: |
-            cd terraform
-            terraform init
-            terraform import google_compute_firewall.icmp projects/proverbial-deck-439120-h2/global/firewalls/icmp
-            terraform import google_compute_firewall.http projects/proverbial-deck-439120-h2/global/firewalls/http
-            terraform import google_compute_firewall.ssh projects/proverbial-deck-439120-h2/global/firewalls/ssh
-            terraform import google_compute_address.static projects/proverbial-deck-439120-h2/regions/us-west1/addresses/api-server-ip
-            terraform import google_compute_instance.api_server projects/proverbial-deck-439120-h2/zones/us-west1-a/instances/api-server
-            terraform plan
-            terraform apply -auto-approve
+      - uses: actions/checkout@v2
+      - name: "Authenticate with Google Cloud"
+        uses: google-github-actions/auth@v0.4.0
+        with:
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
+      - name: "Setup Terraform"
+        uses: hashicorp/setup-terraform@v1
+      - name: "Run Terraform"
+        run: |
+          cd terraform
+          terraform init
+          terraform import google_compute_firewall.icmp projects/proverbial-deck-439120-h2/global/firewalls/icmp
+          terraform import google_compute_firewall.http projects/proverbial-deck-439120-h2/global/firewalls/http
+          terraform import google_compute_firewall.ssh projects/proverbial-deck-439120-h2/global/firewalls/ssh
+          terraform import google_compute_address.static projects/proverbial-deck-439120-h2/regions/us-west1/addresses/api-server-ip
+          terraform import google_compute_instance.api_server projects/proverbial-deck-439120-h2/zones/us-west1-a/instances/api-server
+          terraform plan
+          terraform apply -auto-approve

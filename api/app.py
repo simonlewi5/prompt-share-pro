@@ -5,9 +5,10 @@ from google.cloud import firestore
 app = Flask(__name__)
 db = firestore.Client()
 
-@app.route('/')
+
+@app.route("/")
 def home():
-    return '''
+    return """
     <!DOCTYPE html>
     <html>
     <head>
@@ -18,22 +19,25 @@ def home():
         <p>This is the root endpoint of the Flask API.</p>
     </body>
     </html>
-    '''
+    """
 
-@app.route('/health')
+
+@app.route("/health")
 def health():
     return jsonify(status="healthy", message="API is up and running")
 
-@app.route('/test_db')
+
+@app.route("/test_db")
 def test_db():
     random_number = random.randint(1, 100)
 
-    doc_ref = db.collection('test_collection').document()
-    doc_ref.set({
-        'random_number': random_number
-    })
+    doc_ref = db.collection("test_collection").document()
+    doc_ref.set({"random_number": random_number})
 
-    return jsonify(status="success", message=f"Inserted record with random number: {random_number}")
+    return jsonify(
+        status="success", message=f"Inserted record with random number: {random_number}"
+    )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     app.run(debug=True)

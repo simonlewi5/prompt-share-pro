@@ -1,10 +1,12 @@
 import random
 from flask import Flask, jsonify
 from google.cloud import firestore
+from api.routes.auth import auth_bp
 
 app = Flask(__name__)
 db = firestore.Client()
 
+app.register_blueprint(auth_bp)
 
 @app.route("/")
 def home():
@@ -21,11 +23,9 @@ def home():
     </html>
     """
 
-
 @app.route("/health")
 def health():
     return jsonify(status="healthy", message="API is up and running")
-
 
 @app.route("/test_db")
 def test_db():
@@ -37,7 +37,6 @@ def test_db():
     return jsonify(
         status="success", message=f"Inserted record with random number: {random_number}"
     )
-
 
 if __name__ == "__main__":
     app.run(debug=True)

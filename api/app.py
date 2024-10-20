@@ -5,7 +5,6 @@ import random
 from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from google.cloud import firestore
-from api.routes.auth import auth_bp
 from api.config import config
 
 app = Flask(__name__)
@@ -14,6 +13,7 @@ app.config['JWT_SECRET_KEY'] = config.JWT_SECRET_KEY
 db = firestore.Client()
 jwt = JWTManager(app)
 
+from api.routes.auth import auth_bp
 app.register_blueprint(auth_bp)
 
 @app.route("/")

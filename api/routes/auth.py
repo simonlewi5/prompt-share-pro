@@ -4,10 +4,10 @@ Authentication routes
 /login: Login user
 """
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from google.cloud import firestore
 from google.api_core.exceptions import GoogleAPICallError, NotFound, AlreadyExists
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, get_jwt_manager
 from api.models.user import User
 from api.utils.validators import is_valid_usc_email, is_valid_usc_id
 
@@ -64,6 +64,10 @@ def login():
     """
     Login user
     """
+    print(f"JWT Secret Key: {current_app.config.get('JWT_SECRET_KEY')}")
+    print(f"JWT Initialized: {'JWTManager' in current_app.extensions}")
+    print(f"Current app extensions: {current_app.extensions}")
+
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')

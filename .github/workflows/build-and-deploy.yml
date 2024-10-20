@@ -62,6 +62,11 @@ jobs:
           echo "${{ secrets.GCP_CREDENTIALS_BASE64 }}" | base64 --decode > /tmp/gcp-credentials.json
           export GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcp-credentials.json
 
+      - name: "Set JWT_SECRET_KEY"
+        run: |
+          echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> /tmp/.env
+          export JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
+
       - name: "Kill existing Flask process"
         uses: appleboy/ssh-action@master
         with:

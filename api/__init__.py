@@ -4,8 +4,8 @@ Initialize the Flask application and other extensions like JWT and Firestore
 from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from google.cloud import firestore
+from api.routes.auth import auth_bp
 
-jwt = JWTManager()
 db = firestore.Client()
 
 def create_app(config_object='api.config.Config'):
@@ -15,10 +15,15 @@ def create_app(config_object='api.config.Config'):
     app = Flask(__name__)
     app.config.from_object(config_object)
 
-    jwt.init_app(app)
+    print(f"Current app before JWT: {app}")
 
-    from api.routes.auth import auth_bp # pylint: disable=C0415
+    jwt = JWTManager(app)
+
+    print(f"Current app after JWT, before blueprint registered: {app}")
+
     app.register_blueprint(auth_bp)
+
+    print(f"Current app after blueprint registered: {app}")
 
     # Register other blueprints and routes
 

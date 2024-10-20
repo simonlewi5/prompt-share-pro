@@ -62,17 +62,6 @@ jobs:
           echo "${{ secrets.GCP_CREDENTIALS_BASE64 }}" | base64 --decode > /tmp/gcp-credentials.json
           export GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcp-credentials.json
 
-      - name: "Copy kill script to Flask server"
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.API_SERVER_IP }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "./api/scripts/kill.sh"
-          target: "/opt/flask-app"
-          overwrite: true
-          strip_components: 2
-
       - name: "Kill existing Flask process"
         uses: appleboy/ssh-action@master
         with:
@@ -80,7 +69,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            bash /opt/flask-app/kill.sh
+            bash /opt/flask-app/scripts/kill.sh
 
       - name: "Start Flask app using gunicorn"
         uses: appleboy/ssh-action@master

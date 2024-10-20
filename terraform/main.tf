@@ -80,5 +80,3 @@ resource "google_compute_firewall" "icmp" {
     source_ranges = ["0.0.0.0/0"]
     target_tags = ["api-server"]
 }
-
-

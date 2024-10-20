@@ -57,7 +57,7 @@ def create_app():
         return jsonify(status="healthy", message="API is up and running")
 
     @app.route("/login2", methods=['POST'])
-    def login():
+    def login2():
         """
         Login user
         """
@@ -89,7 +89,7 @@ def create_app():
 
         if exception_found:
             return exception_found
-        
+
         access_token = create_access_token(identity=user['email'])
         return jsonify(access_token=access_token), 200
 

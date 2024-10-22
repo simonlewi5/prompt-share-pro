@@ -39,6 +39,7 @@ dependencies:
   logger: ^2.4.0
   shared_preferences: ^2.3.2
   provider: ^6.1.2
+  dart_jsonwebtoken: ^2.14.1
 
 dev_dependencies:
   flutter_test:

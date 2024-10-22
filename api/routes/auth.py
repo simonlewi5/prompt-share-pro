@@ -4,6 +4,7 @@ Authentication routes
 /login: Login user
 """
 
+from datetime import timedelta
 from flask import Blueprint, request, jsonify
 from google.cloud import firestore
 from google.api_core.exceptions import GoogleAPICallError, NotFound, AlreadyExists
@@ -22,6 +23,7 @@ def signup():
     data = request.get_json()
 
     usc_id = data.get('usc_id')
+    username = data.get('username')
     email = data.get('email')
     password = data.get('password')
 
@@ -46,7 +48,7 @@ def signup():
 
     # Create user
     try:
-        User.create(email, usc_id, password)
+        User.create(email, username, usc_id, password)
         user = User.get_by_email(email)
     except AlreadyExists:
         exception_found = jsonify(message="User already exists"), 400
@@ -58,7 +60,13 @@ def signup():
     if exception_found:
         return exception_found
 
-    access_token = create_access_token(identity=user['email'])
+    claims = {
+        'username': user['username'],
+        'email': user['email'],
+    }
+    expires = timedelta(days=1)
+
+    access_token = create_access_token(identity=claims, expires_delta=expires)
     return jsonify(access_token=access_token), 200
 
 @auth_bp.route('/login', methods=['POST'])
@@ -92,5 +100,11 @@ def login():
         return exception_found
 
     # Generate access token
-    access_token = create_access_token(identity=user['email'])
+    claims = {
+        'username': user['username'],
+        'email': user['email'],
+    }
+    expires = timedelta(days=1)
+
+    access_token = create_access_token(identity=claims, expires_delta=expires)
     return jsonify(access_token=access_token), 200

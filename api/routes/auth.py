@@ -47,6 +47,7 @@ def signup():
     # Create user
     try:
         User.create(email, usc_id, password)
+        user = User.get_by_email(email)
     except AlreadyExists:
         exception_found = jsonify(message="User already exists"), 400
     except GoogleAPICallError as e:
@@ -57,7 +58,8 @@ def signup():
     if exception_found:
         return exception_found
 
-    return jsonify(message="User created successfully"), 201
+    access_token = create_access_token(identity=user['email'])
+    return jsonify(access_token=access_token), 200
 
 @auth_bp.route('/login', methods=['POST'])
 def login():

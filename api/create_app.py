@@ -6,6 +6,7 @@ from flask_jwt_extended import JWTManager
 from google.cloud import firestore
 from dotenv import load_dotenv
 from api.routes.auth import auth_bp
+from api.routes.post import post_bp
 
 load_dotenv()
 db = firestore.Client()
@@ -20,6 +21,7 @@ def create_app(config_object='api.config.Config'):
     jwt = JWTManager(app) # pylint: disable=unused-variable
 
     app.register_blueprint(auth_bp)
+    app.register_blueprint(post_bp)
 
     @app.route("/")
     def home():

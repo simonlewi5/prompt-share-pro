@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../models/login_request.dart';
-import '../models/signup_request.dart';
+import 'package:flutter_app/features/auth/models/login_request.dart';
+import 'package:flutter_app/features/auth/models/signup_request.dart';
 
 class AuthRepository {
   final String baseUrl = "https://www.promptsharepro24.com";

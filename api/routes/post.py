@@ -41,6 +41,20 @@ def create_post():
 
     return jsonify(message="Post created", post_id=post_id), 201
 
+@post_bp.route('/posts', methods=['GET'])
+def get_all_posts():
+    """
+    Get all posts
+    """
+    try:
+        posts_ref = Post.db.collection('posts').stream()
+        posts = [doc.to_dict() for doc in posts_ref]
+        return jsonify(posts), 200
+    except GoogleAPICallError as e:
+        return jsonify(message=f"Error accessing Firestore: {str(e)}"), 500
+    except RuntimeError as e:
+        return jsonify(message=f"Unexpected error: {str(e)}"), 500
+
 # Get a post by its ID
 @post_bp.route('/posts/<post_id>', methods=['GET'])
 def get_post(post_id):

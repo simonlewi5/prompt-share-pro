@@ -14,6 +14,19 @@ class PostRepository {
     return response;
   }
 
+  Future<List<Post>> getAllPosts() async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/posts'),
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> jsonData = jsonDecode(response.body);
+      return jsonData.map((post) => Post.fromJson(post)).toList();
+    } else {
+      throw Exception('Failed to load posts');
+    }
+  }
+
   Future<http.Response> getPostById(String postId) async {
     final response = await http.get(
       Uri.parse('$baseUrl/posts/$postId'),

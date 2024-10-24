@@ -23,6 +23,7 @@ def create(post_id):
 
     try:
         comment_id = Comment.create(post_id, author_email, content)
+        print(f"Comment created with ID: {comment_id}")
         return jsonify({
             'message': 'Comment added successfully',
             'comment_id': comment_id

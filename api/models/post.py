@@ -1,6 +1,3 @@
-"""
-Post model
-"""
 from datetime import datetime
 from google.cloud import firestore
 from google.api_core.exceptions import GoogleAPICallError, NotFound
@@ -29,7 +26,7 @@ class Post:
                 'created_at': datetime.utcnow(),
             }
             post_ref.set(post_data)
-            return post_ref.id
+            return post_ref.id  # Return the generated post ID
         except GoogleAPICallError as e:
             raise GoogleAPICallError(f"Firestore error while creating post: {str(e)}") from e
         except Exception as e:
@@ -48,7 +45,9 @@ class Post:
             post_ref = Post.db.collection('posts').document(post_id).get()
             if not post_ref.exists:
                 raise NotFound(f"Post with ID {post_id} not found.")
-            return post_ref.to_dict()
+            post = post_ref.to_dict()
+            post['id'] = post_ref.id  # Attach the Firestore document ID
+            return post
         except NotFound as e:
             raise NotFound(str(e)) from e
         except GoogleAPICallError as e:
@@ -67,12 +66,17 @@ class Post:
         """
         try:
             post_ref = Post.db.collection('posts').document(post_id)
-            post_ref.update({
-                'title': title,
-                'llm_kind': llm_kind,
-                'content': content,
-                'updated_at': datetime.utcnow(),
-            })
+            updates = {}
+            if title:
+                updates['title'] = title
+            if llm_kind:
+                updates['llm_kind'] = llm_kind
+            if content:
+                updates['content'] = content
+            if updates:
+                updates['updated_at'] = datetime.utcnow()
+                post_ref.update(updates)
+            return True
         except NotFound as e:
             raise NotFound(f"Post with ID {post_id} not found.") from e
         except GoogleAPICallError as e:
@@ -92,6 +96,7 @@ class Post:
         try:
             post_ref = Post.db.collection('posts').document(post_id)
             post_ref.delete()
+            return True
         except NotFound as e:
             raise NotFound(f"Post with ID {post_id} not found.") from e
         except GoogleAPICallError as e:

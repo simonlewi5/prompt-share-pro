@@ -32,7 +32,7 @@ class Comment:
                 'created_at': datetime.utcnow(),
             }
             comment_ref.set(comment_data)
-            return comment_ref.id
+            return comment_ref.id  # Return the Firestore document ID
         except NotFound as e:
             raise NotFound(str(e)) from e
         except GoogleAPICallError as e:
@@ -56,7 +56,11 @@ class Comment:
                 raise NotFound(f"Post with ID {post_id} not found.")
 
             comments_ref = post_ref.collection('comments').stream()
-            comments = [comment.to_dict() for comment in comments_ref]
+            comments = []
+            for comment in comments_ref:
+                comment_data = comment.to_dict()
+                comment_data['id'] = comment.id
+                comments.append(comment_data)
             return comments
         except NotFound as e:
             raise NotFound(str(e)) from e
@@ -88,3 +92,4 @@ class Comment:
             raise GoogleAPICallError(f"Firestore error while deleting comment: {str(e)}") from e
         except Exception as e:
             raise RuntimeError(f"Unexpected error: {str(e)}") from e
+

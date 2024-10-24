@@ -48,7 +48,11 @@ def get_all_posts():
     """
     try:
         posts_ref = Post.db.collection('posts').stream()
-        posts = [doc.to_dict() for doc in posts_ref]
+        posts = []
+        for doc in posts_ref:
+            post = doc.to_dict()
+            post['id'] = doc.id  # Attach Firestore document ID to the post
+            posts.append(post)
         return jsonify(posts), 200
     except GoogleAPICallError as e:
         return jsonify(message=f"Error accessing Firestore: {str(e)}"), 500

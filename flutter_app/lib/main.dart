@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
     final userState = Provider.of<UserState>(context);
 
     return MaterialApp(
-      title: 'Your App',
+      title: 'Prompt Share Pro',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: userState.token.isNotEmpty ? const HomeScreen() : const WelcomeScreen(),
     );

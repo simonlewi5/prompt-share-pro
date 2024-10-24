@@ -17,7 +17,8 @@ def add_comment(post_id):
 
     author_email = data.get('author_email')
     content = data.get('content')
-    
+
+    # Validate inputs
     if not content or not author_email:
         return jsonify({'message': 'Author email and content are required'}), 400
 
@@ -25,8 +26,8 @@ def add_comment(post_id):
     try:
         comment_id = Comment.create(post_id, author_email, content)
         return jsonify({'message': 'Comment added successfully', 'comment_id': comment_id}), 201
-    except NotFound:
-        return jsonify({'message': f"Post with ID {post_id} not found"}), 404
+    except NotFound as e:
+        return jsonify({'message': str(e)}), 404  # More specific NotFound message
     except GoogleAPICallError as e:
         return jsonify({'message': f"Error creating comment: {str(e)}"}), 500
     except RuntimeError as e:
@@ -42,8 +43,8 @@ def get_comments(post_id):
     try:
         comments = Comment.get_by_post(post_id)
         return jsonify(comments), 200
-    except NotFound:
-        return jsonify({'message': f"Post with ID {post_id} not found"}), 404
+    except NotFound as e:
+        return jsonify({'message': str(e)}), 404  # More specific NotFound message
     except GoogleAPICallError as e:
         return jsonify({'message': f"Error retrieving comments: {str(e)}"}), 500
     except RuntimeError as e:
@@ -59,9 +60,10 @@ def delete_comment(post_id, comment_id):
     try:
         Comment.delete(post_id, comment_id)
         return jsonify({'message': 'Comment deleted successfully'}), 200
-    except NotFound:
-        return jsonify({'message': f"Comment with ID {comment_id} not found"}), 404
+    except NotFound as e:
+        return jsonify({'message': str(e)}), 404  # More specific NotFound message
     except GoogleAPICallError as e:
         return jsonify({'message': f"Error deleting comment: {str(e)}"}), 500
     except RuntimeError as e:
         return jsonify({'message': f"Unexpected error: {str(e)}"}), 500
+

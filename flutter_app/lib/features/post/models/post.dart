@@ -1,10 +1,12 @@
 class Post {
+  final String? id;
   final String authorEmail;
   final String title;
   final String llmKind;
   final String content;
 
   Post({
+    this.id,
     required this.authorEmail,
     required this.title,
     required this.llmKind,
@@ -22,6 +24,7 @@ class Post {
 
   factory Post.fromJson(Map<String, dynamic> json) {
     return Post(
+      id: json['id'],
       authorEmail: json['author_email'],
       title: json['title'],
       llmKind: json['llm_kind'],

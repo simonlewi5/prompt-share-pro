@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:flutter_app/features/post/data/post_repository.dart';
 import 'package:flutter_app/features/post/models/post.dart';
+import 'package:flutter_app/features/post/views/post_detail_screen.dart';
 import 'package:flutter_app/features/home/views/home_screen.dart';
 
 var logger = Logger();
@@ -30,7 +31,7 @@ class PostListScreenState extends State<PostListScreen> {
         posts = fetchedPosts;
       });
     } catch (e) {
-      print('Failed to load posts: $e');
+      logger.e('Failed to load posts: $e');
     }
   }
 
@@ -48,6 +49,14 @@ class PostListScreenState extends State<PostListScreen> {
                 return ListTile(
                   title: Text(post.title),
                   subtitle: Text('LLM Kind: ${post.llmKind}\n${post.content}'),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PostDetailScreen(postId: post.id!),
+                      ),
+                    );
+                  },
                 );
               },
             ),

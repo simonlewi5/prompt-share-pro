@@ -1,7 +1,7 @@
 """
 Comment model
 """
-from datetime import datetime
+from datetime import datetime, timezone
 from google.cloud import firestore
 from google.api_core.exceptions import GoogleAPICallError, NotFound
 
@@ -29,7 +29,7 @@ class Comment:
             comment_data = {
                 'author_email': author_email,
                 'content': content,
-                'created_at': datetime.utcnow(),
+                'created_at': datetime.now(timezone.utc),
             }
             print(f"Creating comment at path: {comment_ref.path}")
             print(f"Comment data: {comment_data}")

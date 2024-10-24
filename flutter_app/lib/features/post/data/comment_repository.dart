@@ -1,6 +1,9 @@
 import 'dart:convert';
+import 'package:logger/logger.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_app/features/post/models/comment.dart';
+
+var logger = Logger();
 
 class CommentRepository {
   final String baseUrl = "https://www.promptsharepro24.com";
@@ -11,6 +14,7 @@ class CommentRepository {
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(comment.toJson()),
     );
+    logger.i(response);
     return response;
   }
 

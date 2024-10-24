@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from google.cloud import firestore
 from google.api_core.exceptions import GoogleAPICallError, NotFound
 
@@ -23,7 +23,7 @@ class Post:
                 'title': title,
                 'llm_kind': llm_kind,
                 'content': content,
-                'created_at': datetime.utcnow(),
+                'created_at': datetime.now(timezone.utc),
             }
             post_ref.set(post_data)
             return post_ref.id  # Return the generated post ID

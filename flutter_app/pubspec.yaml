@@ -41,6 +41,7 @@ dependencies:
   provider: ^6.1.2
   dart_jsonwebtoken: ^2.14.1
   cloud_firestore: ^5.4.4
+  intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:

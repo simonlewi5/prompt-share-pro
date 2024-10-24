@@ -31,8 +31,10 @@ class Comment:
                 'content': content,
                 'created_at': datetime.utcnow(),
             }
+            print(f"Creating comment at path: {comment_ref.path}")
+            print(f"Comment data: {comment_data}")
             comment_ref.set(comment_data)
-            return comment_ref.id  # Return the Firestore document ID
+            return comment_ref.id
         except NotFound as e:
             raise NotFound(str(e)) from e
         except GoogleAPICallError as e:

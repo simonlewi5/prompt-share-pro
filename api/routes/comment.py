@@ -19,9 +19,7 @@ def create(post_id):
     content = data.get('content')
 
     if not content or not author_email:
-        return jsonify({
-            'message': 'Author email and content are required'
-            }), 400
+        return jsonify({'message': 'Author email and content are required'}), 400
 
     try:
         comment_id = Comment.create(post_id, author_email, content)

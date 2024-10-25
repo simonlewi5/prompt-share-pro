@@ -19,6 +19,7 @@ class CreatePostScreen extends StatefulWidget {
 class CreatePostScreenState extends State<CreatePostScreen> {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController contentController = TextEditingController();
+  final TextEditingController authorNotesController = TextEditingController();
   String llmKind = 'GPT-3';
   final PostRepository postRepository = PostRepository();
 
@@ -30,6 +31,7 @@ class CreatePostScreenState extends State<CreatePostScreen> {
       title: titleController.text,
       llmKind: llmKind,
       content: contentController.text,
+      authorNotes: authorNotesController.text,
     );
 
     final response = await postRepository.createPost(post);
@@ -41,7 +43,7 @@ class CreatePostScreenState extends State<CreatePostScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => const PostListScreen(), // Redirect to PostListScreen after creation
+            builder: (context) => const PostListScreen(),
           ),
         );
       }
@@ -81,6 +83,11 @@ class CreatePostScreenState extends State<CreatePostScreen> {
               controller: contentController,
               decoration: const InputDecoration(labelText: 'Content'),
               maxLines: 6,
+            ),
+            TextField(
+              controller: authorNotesController,
+              decoration: const InputDecoration(labelText: 'Author Notes'),
+              maxLines: 3,
             ),
             const SizedBox(height: 20),
             ElevatedButton(

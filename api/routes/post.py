@@ -48,6 +48,7 @@ def get_all_posts():
         for doc in posts_ref:
             post = doc.to_dict()
             post['id'] = doc.id
+            post.pop('user_ratings', None)
             posts.append(post)
         return jsonify(posts), 200
     except GoogleAPICallError as e:
@@ -64,6 +65,7 @@ def get_post(post_id):
     """
     try:
         post = Post.get_by_id(post_id)
+        post.pop('user_ratings', None)
     except NotFound:
         return jsonify(message="Post not found"), 404
     except GoogleAPICallError as e:
@@ -148,6 +150,33 @@ def rate_post(post_id):
     try:
         Post.rate_post(post_id, user_email, rating)
         return jsonify(message="Post rated successfully"), 200
+    except NotFound:
+        return jsonify(message="Post not found"), 404
+    except GoogleAPICallError as e:
+        return jsonify(message=f"Error accessing Firestore: {str(e)}"), 500
+    except RuntimeError as e:
+        return jsonify(message=f"Unexpected error: {str(e)}"), 500
+
+@post_bp.route('/posts/<post_id>/has_rated', methods=['GET'])
+@jwt_required()
+def has_rated(post_id):
+    """
+    Check if the current user has already rated a post
+    """
+    user_email = get_jwt_identity()
+
+    try:
+        post = Post.get_by_id(post_id)
+        user_ratings = post.get('user_ratings', {})
+
+        if user_email in user_ratings:
+            return jsonify({
+                'has_rated': True,
+                'rating': user_ratings[user_email]
+            }), 200
+        return jsonify({
+            'has_rated': False
+        }), 200
     except NotFound:
         return jsonify(message="Post not found"), 404
     except GoogleAPICallError as e:

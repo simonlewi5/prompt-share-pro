@@ -3,6 +3,7 @@ import 'package:flutter_app/features/post/data/post_repository.dart';
 import 'package:flutter_app/features/post/models/post.dart';
 import 'package:flutter_app/features/post/views/comment_section.dart';
 import 'dart:convert';
+import 'package:logger/logger.dart';
 
 class PostDetailScreen extends StatefulWidget {
   final String postId;
@@ -10,18 +11,22 @@ class PostDetailScreen extends StatefulWidget {
   const PostDetailScreen({super.key, required this.postId});
 
   @override
-  _PostDetailScreenState createState() => _PostDetailScreenState();
+  PostDetailScreenState createState() => PostDetailScreenState();
 }
 
-class _PostDetailScreenState extends State<PostDetailScreen> {
+class PostDetailScreenState extends State<PostDetailScreen> {
   final PostRepository postRepository = PostRepository();
+  final logger = Logger();
   late Post post;
   bool isLoading = true;
+  bool hasRated = false;
+  int? userRating;
 
   @override
   void initState() {
     super.initState();
     _fetchPost();
+    _checkIfRated();
   }
 
   void _fetchPost() async {
@@ -33,16 +38,44 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           isLoading = false;
         });
       } else {
-        print('Failed to load post');
+        logger.e('Failed to load post: ${response.statusCode}');
         setState(() {
           isLoading = false;
         });
       }
     } catch (e) {
-      print('Failed to load post: $e');
+      logger.e('Failed to load post: $e');
       setState(() {
         isLoading = false;
       });
+    }
+  }
+
+  void _checkIfRated() async {
+    try {
+      bool result = await postRepository.hasRatedPost(widget.postId);
+      setState(() {
+        hasRated = result;
+      });
+    } catch (e) {
+      logger.e('Error checking if rated: $e');
+    }
+  }
+
+  void _ratePost(int rating) async {
+    try {
+      final response = await postRepository.ratePost(widget.postId, rating);
+      if (response.statusCode == 200) {
+        logger.i('Successfully rated post');
+        setState(() {
+          userRating = rating;
+          hasRated = true;
+        });
+      } else {
+        logger.e('Failed to rate post: ${response.statusCode}');
+      }
+    } catch (e) {
+      logger.e('Failed to rate post: $e');
     }
   }
 
@@ -65,6 +98,37 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
             Text('LLM Kind: ${post.llmKind}'),
             const SizedBox(height: 10),
             Text(post.content),
+            const SizedBox(height: 10),
+            if (post.authorNotes.isNotEmpty)
+              Text('Author Notes: ${post.authorNotes}'),
+            const SizedBox(height: 20),
+            if (post.averageRating != null)
+              Text('Average Rating: ${post.averageRating?.toStringAsFixed(1)}'),
+            const SizedBox(height: 10),
+            if (hasRated)
+              Text('You rated this post: $userRating')
+            else
+              Row(
+                children: [
+                  const Text('Rate this post:'),
+                  const SizedBox(width: 10),
+                  DropdownButton<int>(
+                    value: userRating,
+                    hint: const Text('Select Rating'),
+                    items: [1, 2, 3, 4, 5].map((int value) {
+                      return DropdownMenuItem<int>(
+                        value: value,
+                        child: Text(value.toString()),
+                      );
+                    }).toList(),
+                    onChanged: (newValue) {
+                      if (newValue != null) {
+                        _ratePost(newValue);
+                      }
+                    },
+                  ),
+                ],
+              ),
             const SizedBox(height: 20),
             const Divider(),
             CommentSection(postId: widget.postId),

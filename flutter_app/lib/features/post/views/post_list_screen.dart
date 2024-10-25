@@ -48,7 +48,16 @@ class PostListScreenState extends State<PostListScreen> {
                 final post = posts[index];
                 return ListTile(
                   title: Text(post.title),
-                  subtitle: Text('LLM Kind: ${post.llmKind}\n${post.content}'),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('LLM Kind: ${post.llmKind}'),
+                      if (post.authorNotes.isNotEmpty)
+                        Text('Author Notes: ${post.authorNotes}'),
+                      if (post.averageRating != null && post.totalRatings != null)
+                        Text('Rating: ${post.averageRating?.toStringAsFixed(1)} (${post.totalRatings} ratings)'),
+                    ],
+                  ),
                   onTap: () {
                     Navigator.push(
                       context,

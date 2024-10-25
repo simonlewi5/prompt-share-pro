@@ -20,6 +20,7 @@ def create_post():
     title = data.get('title')
     llm_kind = data.get('llm_kind')
     content = data.get('content')
+    author_notes = data.get('author_notes')
 
     exception_found = None
 
@@ -30,7 +31,7 @@ def create_post():
 
     # Create the post
     try:
-        post_id = Post.create(author_email, title, llm_kind, content)
+        post_id = Post.create(author_email, title, llm_kind, content, author_notes)
     except GoogleAPICallError as e:
         exception_found = jsonify(message=f"Error creating post in Firestore: {str(e)}"), 500
     except RuntimeError as e:
@@ -51,7 +52,7 @@ def get_all_posts():
         posts = []
         for doc in posts_ref:
             post = doc.to_dict()
-            post['id'] = doc.id  # Attach Firestore document ID to the post
+            post['id'] = doc.id
             posts.append(post)
         return jsonify(posts), 200
     except GoogleAPICallError as e:
@@ -136,3 +137,27 @@ def delete_post(post_id):
         return exception_found
 
     return jsonify(message="Post deleted"), 200
+
+# Rate a post by its ID
+@post_bp.route('/posts/<post_id>/rate', methods=['POST'])
+def rate_post(post_id):
+    """
+    Rate a post by its ID
+    """
+    data = request.get_json()
+
+    user_email = data.get('user_email')
+    rating = data.get('rating')
+
+    if not user_email or not rating:
+        return jsonify(message="user_email and rating are required"), 400
+
+    try:
+        Post.rate_post(post_id, user_email, rating)
+        return jsonify(message="Post rated successfully"), 200
+    except NotFound:
+        return jsonify(message="Post not found"), 404
+    except GoogleAPICallError as e:
+        return jsonify(message=f"Error accessing Firestore: {str(e)}"), 500
+    except RuntimeError as e:
+        return jsonify(message=f"Unexpected error: {str(e)}"), 500

@@ -14,7 +14,6 @@ class CommentRepository {
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(comment.toJson()),
     );
-    logger.i(response);
     return response;
   }
 

@@ -1,3 +1,5 @@
+import 'package:flutter_app/features/post/data/post_repository.dart';
+
 class Post {
   final String? id;
   final String authorEmail;
@@ -5,7 +7,6 @@ class Post {
   final String llmKind;
   final String content;
   final String authorNotes;
-  final Map<String, int>? userRatings;
   final int? totalPoints;
   final int? totalRatings;
   final double? averageRating;
@@ -17,7 +18,6 @@ class Post {
     required this.llmKind,
     required this.content,
     required this.authorNotes,
-    this.userRatings,
     this.totalPoints,
     this.totalRatings,
     this.averageRating,
@@ -30,7 +30,6 @@ class Post {
       'llm_kind': llmKind,
       'content': content,
       'author_notes': authorNotes,
-      'user_ratings': userRatings,
       'total_points': totalPoints,
       'total_ratings': totalRatings,
       'average_rating': averageRating,
@@ -45,9 +44,6 @@ class Post {
       llmKind: json['llm_kind'],
       content: json['content'],
       authorNotes: json['author_notes'],
-      userRatings: json['user_ratings'] != null
-          ? Map<String, int>.from(json['user_ratings'])
-          : null,
       totalPoints: json['total_points'],
       totalRatings: json['total_ratings'],
       averageRating: (json['average_rating'] != null)
@@ -56,7 +52,12 @@ class Post {
     );
   }
 
-  int? getUserRating(String userEmail) {
-    return userRatings != null ? userRatings![userEmail] : null;
+  static Future<bool> hasUserRated(String postId, String userEmail) async {
+    final PostRepository postRepository = PostRepository();
+    try {
+      return await postRepository.hasRatedPost(postId);
+    } catch (e) {
+      return false;
+    }
   }
 }

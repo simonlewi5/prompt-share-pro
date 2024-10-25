@@ -49,4 +49,16 @@ class PostRepository {
     );
     return response;
   }
+
+  Future<http.Response> ratePost(String postId, String userEmail, int rating) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/posts/$postId/rate'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'user_email': userEmail,
+        'rating': rating,
+      }),
+    );
+    return response;
+  }
 }

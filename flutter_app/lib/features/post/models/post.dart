@@ -4,6 +4,8 @@ class Post {
   final String title;
   final String llmKind;
   final String content;
+  final String authorNotes;
+  final Map<String, int>? userRatings;
 
   Post({
     this.id,
@@ -11,6 +13,8 @@ class Post {
     required this.title,
     required this.llmKind,
     required this.content,
+    required this.authorNotes,
+    this.userRatings,
   });
 
   Map<String, dynamic> toJson() {
@@ -19,6 +23,8 @@ class Post {
       'title': title,
       'llm_kind': llmKind,
       'content': content,
+      'author_notes': authorNotes,
+      'user_ratings': userRatings,
     };
   }
 
@@ -29,6 +35,16 @@ class Post {
       title: json['title'],
       llmKind: json['llm_kind'],
       content: json['content'],
+      authorNotes: json['author_notes'],
+      userRatings: json['user_ratings'] != null
+          ? Map<String, int>.from(json['user_ratings'])
+          : null,
     );
   }
+
+  int? getUserRating(String userEmail) {
+    return userRatings != null ? userRatings![userEmail] : null;
+  }
+
+  
 }

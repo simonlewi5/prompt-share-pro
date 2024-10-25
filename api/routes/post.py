@@ -2,6 +2,7 @@
 This module contains the routes for the Post model
 """
 from flask import Blueprint, request, jsonify
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from google.api_core.exceptions import GoogleAPICallError, NotFound
 from api.models.post import Post
 from api.utils.validators import validate_post_data
@@ -10,39 +11,33 @@ post_bp = Blueprint('post', __name__)
 
 # Create a new post
 @post_bp.route('/posts', methods=['POST'])
+@jwt_required()
 def create_post():
     """
     Create a new post
     """
     data = request.get_json()
-
-    author_email = data.get('author_email')
+    author_email = get_jwt_identity()
     title = data.get('title')
     llm_kind = data.get('llm_kind')
     content = data.get('content')
     author_notes = data.get('author_notes')
 
-    exception_found = None
-
-    # Validate input
     exception = validate_post_data(data)
     if exception:
         return exception
 
-    # Create the post
     try:
         post_id = Post.create(author_email, title, llm_kind, content, author_notes)
     except GoogleAPICallError as e:
-        exception_found = jsonify(message=f"Error creating post in Firestore: {str(e)}"), 500
+        return jsonify(message=f"Error creating post in Firestore: {str(e)}"), 500
     except RuntimeError as e:
-        exception_found = jsonify(message=f"Unexpected error: {str(e)}"), 500
-
-    if exception_found:
-        return exception_found
+        return jsonify(message=f"Unexpected error: {str(e)}"), 500
 
     return jsonify(message="Post created", post_id=post_id), 201
 
 @post_bp.route('/posts', methods=['GET'])
+@jwt_required()
 def get_all_posts():
     """
     Get all posts
@@ -62,28 +57,25 @@ def get_all_posts():
 
 # Get a post by its ID
 @post_bp.route('/posts/<post_id>', methods=['GET'])
+@jwt_required()
 def get_post(post_id):
     """
     Get a post by its ID
     """
-    exception_found = None
-
     try:
         post = Post.get_by_id(post_id)
     except NotFound:
-        exception_found = jsonify(message="Post not found"), 404
+        return jsonify(message="Post not found"), 404
     except GoogleAPICallError as e:
-        exception_found = jsonify(message=f"Error accessing Firestore: {str(e)}"), 500
+        return jsonify(message=f"Error accessing Firestore: {str(e)}"), 500
     except RuntimeError as e:
-        exception_found = jsonify(message=f"Unexpected error: {str(e)}"), 500
-
-    if exception_found:
-        return exception_found
+        return jsonify(message=f"Unexpected error: {str(e)}"), 500
 
     return jsonify(post), 200
 
 # Update a post by its ID
 @post_bp.route('/posts/<post_id>', methods=['PUT'])
+@jwt_required()
 def update_post(post_id):
     """
     Update a post by its ID
@@ -118,6 +110,7 @@ def update_post(post_id):
 
 # Delete a post by its ID
 @post_bp.route('/posts/<post_id>', methods=['DELETE'])
+@jwt_required()
 def delete_post(post_id):
     """
     Delete a post by its ID
@@ -140,17 +133,17 @@ def delete_post(post_id):
 
 # Rate a post by its ID
 @post_bp.route('/posts/<post_id>/rate', methods=['POST'])
+@jwt_required()
 def rate_post(post_id):
     """
     Rate a post by its ID
     """
     data = request.get_json()
-
-    user_email = data.get('user_email')
     rating = data.get('rating')
+    user_email = get_jwt_identity()
 
-    if not user_email or not rating:
-        return jsonify(message="user_email and rating are required"), 400
+    if not rating:
+        return jsonify(message="Rating is required"), 400
 
     try:
         Post.rate_post(post_id, user_email, rating)

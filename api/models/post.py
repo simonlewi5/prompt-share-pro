@@ -28,9 +28,12 @@ class Post:
                 'content': content,
                 'author_notes': author_notes,
                 'created_at': datetime.now(timezone.utc),
+                'total_points': 0,
+                'total_ratings': 0,
+                'user_ratings': {}
             }
             post_ref.set(post_data)
-            return post_ref.id  # Return the generated post ID
+            return post_ref.id
         except GoogleAPICallError as e:
             raise GoogleAPICallError(f"Firestore error while creating post: {str(e)}") from e
         except Exception as e:
@@ -124,22 +127,23 @@ class Post:
             post = post_ref.get()
             if not post.exists:
                 raise NotFound(f"Post with ID {post_id} not found.")
-
+            
             post_data = post.to_dict()
             user_ratings = post_data.get('user_ratings', {})
-
-            # Check if the user has already rated the post
+            
             if user_email in user_ratings:
                 raise Exception("User has already rated this post.") # pylint: disable=broad-exception-raised
 
-            # Update user ratings
             user_ratings[user_email] = rating
+            total_points = post_data.get('total_points', 0) + rating
+            total_ratings = post_data.get('total_ratings', 0) + 1
+
             post_ref.update({
                 'user_ratings': user_ratings,
-                'average_rating': sum(user_ratings.values()) / len(user_ratings),
-                'total_ratings': len(user_ratings)
+                'total_points': total_points,
+                'total_ratings': total_ratings,
+                'average_rating': total_points / total_ratings
             })
-
         except NotFound as e:
             raise NotFound(str(e)) from e
         except GoogleAPICallError as e:

@@ -16,14 +16,14 @@ def create(post_id):
     Add a comment to a post
     """
     data = request.get_json()
-    author_email = get_jwt_identity()
+    author = get_jwt_identity()
     content = data.get('content')
 
     if not content:
         return jsonify({'message': 'Content is required'}), 400
 
     try:
-        comment_id = Comment.create(post_id, author_email, content)
+        comment_id = Comment.create(post_id, author, content)
         return jsonify({
             'message': 'Comment added successfully',
             'comment_id': comment_id

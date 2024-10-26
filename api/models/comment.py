@@ -12,7 +12,7 @@ class Comment:
     db = firestore.Client()
 
     @staticmethod
-    def create(post_id, author_email, content):
+    def create(post_id, author, content):
         """
         Create a new comment on a post
         Raises:
@@ -27,7 +27,7 @@ class Comment:
             
             comment_ref = post_ref.collection('comments').document()
             comment_data = {
-                'author_email': author_email,
+                'author': author,
                 'content': content,
                 'created_at': datetime.now(timezone.utc),
             }

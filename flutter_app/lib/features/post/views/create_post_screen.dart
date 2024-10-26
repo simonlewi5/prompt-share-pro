@@ -27,7 +27,6 @@ class CreatePostScreenState extends State<CreatePostScreen> {
     final userState = Provider.of<UserState>(context, listen: false);
 
     Post post = Post(
-      authorEmail: userState.email,
       title: titleController.text,
       llmKind: llmKind,
       content: contentController.text,

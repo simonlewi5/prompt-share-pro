@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:logger/logger.dart';
 import 'package:flutter_app/features/post/data/comment_repository.dart';
 import 'package:flutter_app/features/post/models/comment.dart';
-import 'package:flutter_app/core/services/user_state.dart';
+
+var logger = Logger();
 
 class CommentSection extends StatefulWidget {
   final String postId;
@@ -33,7 +34,7 @@ class CommentSectionState extends State<CommentSection> {
         isLoading = false;
       });
     } catch (e) {
-      print('Failed to load comments: $e');
+      logger.e('Failed to load comments: $e');
       setState(() {
         isLoading = false;
       });
@@ -41,14 +42,11 @@ class CommentSectionState extends State<CommentSection> {
   }
 
   void _addComment() async {
-    final userState = Provider.of<UserState>(context, listen: false);
-
     if (contentController.text.isEmpty) {
       return;
     }
 
     Comment newComment = Comment(
-      authorEmail: userState.email,
       content: contentController.text,
       createdAt: DateTime.now(),
     );
@@ -59,10 +57,10 @@ class CommentSectionState extends State<CommentSection> {
         contentController.clear();
         _fetchComments(); // Refresh comments after adding
       } else {
-        print('Failed to add comment');
+        logger.i('Failed to add comment');
       }
     } catch (e) {
-      print('Failed to add comment: $e');
+      logger.i('Failed to add comment: $e');
     }
   }
 
@@ -87,7 +85,7 @@ class CommentSectionState extends State<CommentSection> {
           itemBuilder: (context, index) {
             final comment = comments[index];
             return ListTile(
-              title: Text(comment.authorEmail),
+              title: Text('${comment.author['username']} (${comment.author['email']})'),
               subtitle: Text(comment.content),
             );
           },

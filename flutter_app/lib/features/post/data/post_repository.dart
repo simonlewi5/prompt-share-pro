@@ -1,7 +1,10 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:logger/logger.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_app/features/post/models/post.dart';
+
+var logger = Logger();
 
 class PostRepository {
   final String baseUrl = "https://www.promptsharepro24.com";

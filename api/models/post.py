@@ -12,7 +12,7 @@ class Post:
     db = firestore.Client()
 
     @staticmethod
-    def create(author_email, title, llm_kind, content, author_notes):
+    def create(author, title, llm_kind, content, author_notes):
         """
         Create a new post
         Raises:
@@ -22,7 +22,7 @@ class Post:
         try:
             post_ref = Post.db.collection('posts').document()
             post_data = {
-                'author_email': author_email,
+                'author': author,
                 'title': title,
                 'llm_kind': llm_kind,
                 'content': content,

@@ -1,8 +1,11 @@
 import 'package:flutter_app/features/post/data/post_repository.dart';
+import 'package:logger/logger.dart';
+
+var logger = Logger();
 
 class Post {
   final String? id;
-  final String authorEmail;
+  final Map<String, String> author;
   final String title;
   final String llmKind;
   final String content;
@@ -13,7 +16,7 @@ class Post {
 
   Post({
     this.id,
-    required this.authorEmail,
+    this.author = const {},
     required this.title,
     required this.llmKind,
     required this.content,
@@ -25,7 +28,7 @@ class Post {
 
   Map<String, dynamic> toJson() {
     return {
-      'author_email': authorEmail,
+      'author_email': author,
       'title': title,
       'llm_kind': llmKind,
       'content': content,
@@ -39,7 +42,7 @@ class Post {
   factory Post.fromJson(Map<String, dynamic> json) {
     return Post(
       id: json['id'],
-      authorEmail: json['author_email'],
+      author: Map<String, String>.from(json['author']),
       title: json['title'],
       llmKind: json['llm_kind'],
       content: json['content'],

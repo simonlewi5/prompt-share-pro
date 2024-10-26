@@ -17,7 +17,7 @@ def create_post():
     Create a new post
     """
     data = request.get_json()
-    author_email = get_jwt_identity()
+    author = get_jwt_identity()
     title = data.get('title')
     llm_kind = data.get('llm_kind')
     content = data.get('content')
@@ -28,7 +28,7 @@ def create_post():
         return exception
 
     try:
-        post_id = Post.create(author_email, title, llm_kind, content, author_notes)
+        post_id = Post.create(author, title, llm_kind, content, author_notes)
     except GoogleAPICallError as e:
         return jsonify(message=f"Error creating post in Firestore: {str(e)}"), 500
     except RuntimeError as e:
@@ -163,7 +163,7 @@ def has_rated(post_id):
     """
     Check if the current user has already rated a post
     """
-    user_email = get_jwt_identity()
+    user_email = get_jwt_identity() # need to check this, i believe it returns both email and username
 
     try:
         post = Post.get_by_id(post_id)

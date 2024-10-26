@@ -4,12 +4,12 @@ import 'package:logger/logger.dart';
 var logger = Logger();
 
 class Comment {
-  final String authorEmail;
+  final Map<String, String> author;
   final String content;
   final DateTime createdAt;
 
   Comment({
-    required this.authorEmail,
+    this.author = const {},
     required this.content,
     required this.createdAt,
   });
@@ -18,7 +18,7 @@ class Comment {
 
   Map<String, dynamic> toJson() {
     return {
-      'author_email': authorEmail,
+      'author': author,
       'content': content,
       'created_at': createdAt.toIso8601String(),
     };
@@ -29,7 +29,7 @@ class Comment {
     DateTime parsedCreatedAt = customDateFormat.parseUtc(createdAtValue);
 
     return Comment(
-      authorEmail: json['author_email'],
+      author: Map<String, String>.from(json['author']),
       content: json['content'],
       createdAt: parsedCreatedAt,
     );

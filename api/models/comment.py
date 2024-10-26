@@ -24,7 +24,7 @@ class Comment:
             post = post_ref.get()
             if not post.exists:
                 raise NotFound(f"Post with ID {post_id} not found.")
-            
+
             comment_ref = post_ref.collection('comments').document()
             comment_data = {
                 'author': author,

@@ -32,6 +32,11 @@ class SignupScreenState extends State<SignupScreen> {
       password: passwordController.text,
       uscId: uscIdController.text,
     );
+
+    if (!verifyFields()) {
+      return;
+    }
+
     final response = await authRepository.signup(request);
 
     if (response.statusCode == 200) {
@@ -59,6 +64,29 @@ class SignupScreenState extends State<SignupScreen> {
     }
   }
 
+  bool verifyFields() {
+    String text = "";
+
+    if (emailController.text.isEmpty ||
+        usernameController.text.isEmpty ||
+        passwordController.text.isEmpty ||
+        uscIdController.text.isEmpty) {
+      text = "Please fill out all fields!";
+    } else if (!emailController.text.endsWith('@usc.edu')) {
+      text = "Please enter a valid USC email!";
+    } else if (uscIdController.text.length != 10 ||
+        !RegExp(r'^[0-9]+$').hasMatch(uscIdController.text)) {
+      text = "Please enter a valid USC ID!";
+    } else {
+      return true;
+    }
+
+    final snackBarMessage = SnackBar(content: Text(text));
+    ScaffoldMessenger.of(context).showSnackBar(snackBarMessage);
+    logger.i(text);
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,6 +98,7 @@ class SignupScreenState extends State<SignupScreen> {
             TextField(
               controller: emailController,
               decoration: const InputDecoration(labelText: 'Email'),
+
             ),
             TextField(
               controller: usernameController,

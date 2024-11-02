@@ -25,6 +25,7 @@ class MyApp extends StatelessWidget {
       title: 'Prompt Share Pro',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: userState.token.isNotEmpty ? const HomeScreen() : const WelcomeScreen(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }

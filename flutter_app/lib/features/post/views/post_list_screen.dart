@@ -68,13 +68,7 @@ class PostListScreenState extends State<PostListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        brightness: isDark ? Brightness.dark : Brightness.light,
-      ),
-      home: Scaffold(
+    return Scaffold(
         appBar: AppBar(
           title: const Text('Posts'),
           actions: [
@@ -101,8 +95,8 @@ class PostListScreenState extends State<PostListScreen> {
                 builder: (context, controller) {
                   return SearchBar(
                     controller: _searchController,
-                    padding: const MaterialStatePropertyAll<EdgeInsets>(
-                        EdgeInsets.symmetric(horizontal: 16.0)),
+                    padding: const WidgetStatePropertyAll<EdgeInsets>(
+                        EdgeInsets.symmetric(horizontal: 10.0, vertical: 2.0)),
                     leading: const Icon(Icons.search),
                     trailing: <Widget>[
                       PopupMenuButton<String>(
@@ -136,8 +130,7 @@ class PostListScreenState extends State<PostListScreen> {
                 },
                 suggestionsBuilder: (context, controller) {
                   return List<ListTile>.generate(
-                    filteredPosts.length,
-                        (index) => ListTile(
+                    filteredPosts.length, (index) => ListTile(
                       title: Text(filteredPosts[index].title),
                       onTap: () {
                         Navigator.push(
@@ -189,7 +182,6 @@ class PostListScreenState extends State<PostListScreen> {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 }

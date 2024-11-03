@@ -51,11 +51,9 @@ class SignupScreenState extends State<SignupScreen> {
       if (mounted) {
         Provider.of<UserState>(context, listen: false).setToken(token);
 
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const HomeScreen(),
-          ),
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+              (Route<dynamic> route) => false,
         );
       }
     } else {

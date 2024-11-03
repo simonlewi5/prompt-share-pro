@@ -28,7 +28,7 @@ class Post {
 
   Map<String, dynamic> toJson() {
     return {
-      'author_email': author,
+      'author': author,
       'title': title,
       'llm_kind': llmKind,
       'content': content,

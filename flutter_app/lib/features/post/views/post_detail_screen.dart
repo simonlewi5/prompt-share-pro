@@ -5,6 +5,8 @@ import 'package:flutter_app/features/post/views/comment_section.dart';
 import 'dart:convert';
 import 'package:logger/logger.dart';
 
+var logger = Logger();
+
 class PostDetailScreen extends StatefulWidget {
   final String postId;
 
@@ -35,6 +37,7 @@ class PostDetailScreenState extends State<PostDetailScreen> {
       if (response.statusCode == 200) {
         setState(() {
           post = Post.fromJson(jsonDecode(response.body));
+          logger.i(jsonEncode(post.toJson()));
           isLoading = false;
         });
       } else {
@@ -93,6 +96,22 @@ class PostDetailScreenState extends State<PostDetailScreen> {
             Text(
               post.title,
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Text.rich(
+              TextSpan(
+                children: [
+                  const TextSpan(
+                    text: 'Author: ',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  TextSpan(
+                    text: '${post.author["username"] ?? 'Unknown'}',
+                    style: const TextStyle(fontStyle: FontStyle.italic),
+                  ),
+                ],
+              ),
+              style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 10),
             Text('LLM Kind: ${post.llmKind}'),

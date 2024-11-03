@@ -5,6 +5,8 @@ import 'package:flutter_app/features/post/models/post.dart';
 import 'package:flutter_app/features/post/views/post_detail_screen.dart';
 import 'package:flutter_app/features/home/views/home_screen.dart';
 
+import 'create_post_screen.dart';
+
 var logger = Logger();
 
 class PostListScreen extends StatefulWidget {
@@ -38,7 +40,24 @@ class PostListScreenState extends State<PostListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Posts')),
+      appBar: AppBar(
+          title: const Text('Posts'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const CreatePostScreen(),
+                ),
+              ).then((_) {
+                _fetchPosts();
+              });
+            },
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Expanded(
@@ -69,18 +88,6 @@ class PostListScreenState extends State<PostListScreen> {
                 );
               },
             ),
-          ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const HomeScreen(),
-                ),
-              );
-            },
-            child: const Text("Home"),
           ),
           const SizedBox(height: 20),
         ],

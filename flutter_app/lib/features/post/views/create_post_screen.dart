@@ -26,6 +26,10 @@ class CreatePostScreenState extends State<CreatePostScreen> {
   void createPost() async {
     final userState = Provider.of<UserState>(context, listen: false);
 
+    if (!isFieldsValid()) {
+      return;
+    }
+
     Post post = Post(
       title: titleController.text,
       llmKind: llmKind,
@@ -39,12 +43,7 @@ class CreatePostScreenState extends State<CreatePostScreen> {
       logger.i("Post created successfully");
 
       if (mounted) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const PostListScreen(),
-          ),
-        );
+        Navigator.popUntil(context, (route) => route.isFirst);
       }
     } else {
       logger.e("Post creation failed: ${response.statusCode}");
@@ -109,5 +108,21 @@ class CreatePostScreenState extends State<CreatePostScreen> {
         ),
       ),
     );
+  }
+
+  bool isFieldsValid() {
+    String text = "";
+
+    if (titleController.text.isEmpty ||
+        contentController.text.isEmpty) {
+      text = "Please fill out all fields!";
+    } else {
+      return true;
+    }
+
+    final snackBarMessage = SnackBar(content: Text(text));
+    ScaffoldMessenger.of(context).showSnackBar(snackBarMessage);
+    logger.i(text);
+    return false;
   }
 }

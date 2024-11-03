@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_app/core/services/user_state.dart';
 import 'package:flutter_app/features/post/views/create_post_screen.dart';
 import 'package:flutter_app/features/post/views/post_list_screen.dart';
+import 'package:flutter_app/features/auth/views/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,17 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // List of screens for each tab
     final List<Widget> screens = <Widget>[
       const PostListScreen(), // Main screen (default view)
-      Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Welcome, ${userState.username}!',
-              style: const TextStyle(fontSize: 24),
-            ),
-          ],
-        ),
-      ),
+      const ProfileScreen(),
     ];
 
     return Scaffold(

@@ -13,20 +13,19 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0; // Default to the Post List screen
+  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     final userState = Provider.of<UserState>(context);
 
-    // List of screens for each tab
     final List<Widget> screens = <Widget>[
-      const PostListScreen(), // Main screen (default view)
+      const PostListScreen(),
       const ProfileScreen(),
     ];
 
     return Scaffold(
-      body: screens[_selectedIndex], // Show the selected screen
+      body: screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(

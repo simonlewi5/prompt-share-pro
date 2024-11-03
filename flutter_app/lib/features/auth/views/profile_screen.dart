@@ -29,7 +29,7 @@ class ProfileScreenState extends State<ProfileScreen> {
     if (mounted) {
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const WelcomeScreen()),
-            (Route<dynamic> route) => false, // This clears all previous routes
+            (Route<dynamic> route) => false,
       );
     }
   }

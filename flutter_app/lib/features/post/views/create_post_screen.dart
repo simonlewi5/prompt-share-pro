@@ -93,17 +93,6 @@ class CreatePostScreenState extends State<CreatePostScreen> {
               child: const Text('Create Post'),
             ),
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const HomeScreen(),
-                  ),
-                );
-              },
-              child: const Text("Home"),
-            ),
           ],
         ),
       ),

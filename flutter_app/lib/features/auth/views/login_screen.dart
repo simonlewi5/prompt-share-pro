@@ -8,6 +8,7 @@ import 'package:flutter_app/features/auth/models/login_request.dart';
 import 'package:flutter_app/features/auth/data/auth_repository.dart';
 import 'package:flutter_app/features/home/views/home_screen.dart';
 import 'package:flutter_app/core/services/user_state.dart';
+import 'package:flutter_app/snackBarMessage.dart';
 
 var logger = Logger();
 
@@ -40,7 +41,11 @@ class LoginScreenState extends State<LoginScreen> {
       await prefs.setString('jwt_token', token);
 
       if (mounted) {
-        Provider.of<UserState>(context, listen: false).setToken(token);
+        final userState = Provider.of<UserState>(context, listen: false);
+        userState.setToken(token);
+
+        snackBarMessage(context, "Welcome back ${userState.username}!");
+
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const HomeScreen()),
               (Route<dynamic> route) => false,

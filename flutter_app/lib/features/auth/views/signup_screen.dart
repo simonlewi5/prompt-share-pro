@@ -10,6 +10,7 @@ import 'package:flutter_app/features/auth/data/auth_repository.dart';
 import 'package:flutter_app/features/home/views/home_screen.dart';
 import 'package:flutter_app/core/services/user_state.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_app/snackBarMessage.dart';
 
 var logger = Logger();
 
@@ -97,8 +98,7 @@ class SignupScreenState extends State<SignupScreen> {
       return true;
     }
 
-    final snackBarMessage = SnackBar(content: Text(text));
-    ScaffoldMessenger.of(context).showSnackBar(snackBarMessage);
+    snackBarMessage(context, text);
     logger.i(text);
     return false;
   }

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_app/features/post/models/post.dart';
 import 'package:flutter_app/features/post/data/post_repository.dart';
 import 'package:flutter_app/core/services/user_state.dart';
+import 'package:flutter_app/snackBarMessage.dart';
 
 var logger = Logger();
 
@@ -40,6 +41,8 @@ class CreatePostScreenState extends State<CreatePostScreen> {
 
     if (response.statusCode == 201) {
       const text = "Post created successfully";
+
+      snackBarMessage(context, text);
       logger.i(text);
 
       if (mounted) {
@@ -154,6 +157,7 @@ class CreatePostScreenState extends State<CreatePostScreen> {
       return true;
     }
 
+    snackBarMessage(context, text);
     logger.i(text);
     return false;
   }

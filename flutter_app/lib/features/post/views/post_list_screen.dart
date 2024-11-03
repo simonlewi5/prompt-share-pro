@@ -56,7 +56,7 @@ class PostListScreenState extends State<PostListScreen> {
           case 'Title':
             return post.title.toLowerCase().contains(query);
           case 'LLM':
-            return post.llmKind.toLowerCase().contains(query);
+            return post.llmKind.any((kind) => kind.toLowerCase().contains(query));
           case 'Full Text':
             return post.content.toLowerCase().contains(query);
           default:
@@ -156,7 +156,7 @@ class PostListScreenState extends State<PostListScreen> {
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('LLM Kind: ${post.llmKind}'),
+                          Text('LLM Kind: ${post.llmKind.join(', ')}'),
                           if (post.authorNotes.isNotEmpty)
                             Text('Author Notes: ${post.authorNotes}'),
                           if (post.averageRating != null &&

@@ -7,7 +7,7 @@ class Post {
   final String? id;
   final Map<String, String> author;
   final String title;
-  final String llmKind;
+  final List<String> llmKind;
   final String content;
   final String authorNotes;
   final int? totalPoints;
@@ -44,7 +44,9 @@ class Post {
       id: json['id'],
       author: Map<String, String>.from(json['author']),
       title: json['title'],
-      llmKind: json['llm_kind'],
+      llmKind: json['llm_kind'] is List
+          ? List<String>.from(json['llm_kind'])
+          : [json['llm_kind'] as String],
       content: json['content'],
       authorNotes: json['author_notes'],
       totalPoints: json['total_points'],

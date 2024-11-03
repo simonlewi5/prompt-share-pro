@@ -114,7 +114,7 @@ class PostDetailScreenState extends State<PostDetailScreen> {
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 10),
-            Text('LLM Kind: ${post.llmKind}'),
+            Text('LLM Kind: ${post.llmKind.join(', ')}'),
             const SizedBox(height: 10),
             Text(post.content),
             const SizedBox(height: 10),

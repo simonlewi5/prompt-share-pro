@@ -53,7 +53,7 @@ class SignupScreenState extends State<SignupScreen> {
 
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const HomeScreen()),
-              (Route<dynamic> route) => false,
+          (Route<dynamic> route) => false,
         );
       }
     } else {
@@ -93,10 +93,20 @@ class SignupScreenState extends State<SignupScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            CircleAvatar(
+              radius: 64,
+              backgroundImage: NetworkImage(
+                  'https://img.freepik.com/premium-vector/robot-circle-vector-icon_418020-452.jpg'),
+            ),
+            Positioned(
+              child: IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.add_a_photo),
+              ),
+            ),
             TextField(
               controller: emailController,
               decoration: const InputDecoration(labelText: 'Email'),
-
             ),
             TextField(
               controller: usernameController,

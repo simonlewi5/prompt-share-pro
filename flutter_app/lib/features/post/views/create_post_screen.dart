@@ -3,9 +3,7 @@ import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_app/features/post/models/post.dart';
 import 'package:flutter_app/features/post/data/post_repository.dart';
-import 'package:flutter_app/features/post/views/post_list_screen.dart';
 import 'package:flutter_app/core/services/user_state.dart';
-import 'package:flutter_app/features/home/views/home_screen.dart';
 
 var logger = Logger();
 
@@ -20,7 +18,8 @@ class CreatePostScreenState extends State<CreatePostScreen> {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController contentController = TextEditingController();
   final TextEditingController authorNotesController = TextEditingController();
-  String llmKind = 'GPT-3';
+  List<String> llmKind = [];
+  final List<String> llmOptions = ['GPT-3', 'GPT-2', 'BERT', 'RoBERTa', 'T5', 'DistilBERT'];
   final PostRepository postRepository = PostRepository();
 
   void createPost() async {
@@ -40,7 +39,8 @@ class CreatePostScreenState extends State<CreatePostScreen> {
     final response = await postRepository.createPost(post);
 
     if (response.statusCode == 201) {
-      logger.i("Post created successfully");
+      const text = "Post created successfully";
+      logger.i(text);
 
       if (mounted) {
         Navigator.popUntil(context, (route) => route.isFirst);
@@ -49,6 +49,56 @@ class CreatePostScreenState extends State<CreatePostScreen> {
       logger.e("Post creation failed: ${response.statusCode}");
       logger.d("Response body: ${response.body}");
     }
+  }
+
+  void _showLLMSelectionDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        List<String> selectedOptions = List.from(llmKind);
+
+        return AlertDialog(
+          title: const Text('Select LLM Models'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: llmOptions.map((option) {
+                return CheckboxListTile(
+                  title: Text(option),
+                  value: selectedOptions.contains(option),
+                  onChanged: (bool? selected) {
+                    setState(() {
+                      if (selected == true) {
+                        selectedOptions.add(option);
+                      } else {
+                        selectedOptions.remove(option);
+                      }
+                    });
+                  },
+                );
+              }).toList(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  llmKind = selectedOptions;
+                });
+                Navigator.pop(context);
+              },
+              child: const Text('Confirm'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -63,19 +113,12 @@ class CreatePostScreenState extends State<CreatePostScreen> {
               controller: titleController,
               decoration: const InputDecoration(labelText: 'Title'),
             ),
-            DropdownButton<String>(
-              value: llmKind,
-              items: ['GPT-3', 'BERT', 'T5'].map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (newValue) {
-                setState(() {
-                  llmKind = newValue!;
-                });
-              },
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: _showLLMSelectionDialog,
+              child: Text(
+                llmKind.isEmpty ? 'Select LLM Models' : 'Selected: ${llmKind.join(', ')}',
+              ),
             ),
             TextField(
               controller: contentController,
@@ -105,12 +148,12 @@ class CreatePostScreenState extends State<CreatePostScreen> {
     if (titleController.text.isEmpty ||
         contentController.text.isEmpty) {
       text = "Please fill out all fields!";
+    } else if (llmKind.isEmpty) {
+      text = "Please select at least one LLM model!";
     } else {
       return true;
     }
 
-    final snackBarMessage = SnackBar(content: Text(text));
-    ScaffoldMessenger.of(context).showSnackBar(snackBarMessage);
     logger.i(text);
     return false;
   }

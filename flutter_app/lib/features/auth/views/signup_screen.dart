@@ -1,5 +1,6 @@
 // signup_screen.dart
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_app/features/auth/models/signup_request.dart';
 import 'package:flutter_app/features/auth/data/auth_repository.dart';
 import 'package:flutter_app/features/home/views/home_screen.dart';
 import 'package:flutter_app/core/services/user_state.dart';
+import 'package:image_picker/image_picker.dart';
 
 var logger = Logger();
 
@@ -19,6 +21,22 @@ class SignupScreen extends StatefulWidget {
 }
 
 class SignupScreenState extends State<SignupScreen> {
+  Uint8List? _profile_image;
+
+  void selectImage() async {
+    final ImagePicker _imagePicker = ImagePicker();
+    XFile? _file = await _imagePicker.pickImage(source: ImageSource.gallery);
+
+    if (_file != null) {
+      Uint8List img = (await _file.readAsBytes()) as Uint8List;
+
+      setState(() {
+        _profile_image = img;
+      });
+    }
+  }
+
+
   final TextEditingController emailController = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -93,14 +111,20 @@ class SignupScreenState extends State<SignupScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            CircleAvatar(
+            _profile_image != null ?
+                CircleAvatar(
+                  radius: 64,
+                  backgroundImage: MemoryImage(_profile_image as Uint8List),
+                )
+            :
+            const CircleAvatar(
               radius: 64,
               backgroundImage: NetworkImage(
                   'https://img.freepik.com/premium-vector/robot-circle-vector-icon_418020-452.jpg'),
             ),
             Positioned(
               child: IconButton(
-                onPressed: () {},
+                onPressed: selectImage,
                 icon: const Icon(Icons.add_a_photo),
               ),
             ),

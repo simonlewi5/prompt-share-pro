@@ -22,26 +22,11 @@ class SignupScreen extends StatefulWidget {
 }
 
 class SignupScreenState extends State<SignupScreen> {
-  Uint8List? _profile_image;
-
-  void selectImage() async {
-    final ImagePicker _imagePicker = ImagePicker();
-    XFile? _file = await _imagePicker.pickImage(source: ImageSource.gallery);
-
-    if (_file != null) {
-      Uint8List img = (await _file.readAsBytes()) as Uint8List;
-
-      setState(() {
-        _profile_image = img;
-      });
-    }
-  }
-
-
   final TextEditingController emailController = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController uscIdController = TextEditingController();
+  Uint8List? profileImage;
   final AuthRepository authRepository = AuthRepository();
 
   void signup() async {
@@ -50,6 +35,7 @@ class SignupScreenState extends State<SignupScreen> {
       username: usernameController.text,
       password: passwordController.text,
       uscId: uscIdController.text,
+      profileImage: profileImage,
     );
 
     if (!verifyFields()) {
@@ -72,7 +58,7 @@ class SignupScreenState extends State<SignupScreen> {
 
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const HomeScreen()),
-          (Route<dynamic> route) => false,
+              (Route<dynamic> route) => false,
         );
       }
     } else {
@@ -103,6 +89,19 @@ class SignupScreenState extends State<SignupScreen> {
     return false;
   }
 
+  void selectImage() async {
+    final ImagePicker _imagePicker = ImagePicker();
+    XFile? _file = await _imagePicker.pickImage(source: ImageSource.gallery);
+
+    if (_file != null) {
+      Uint8List img = (await _file.readAsBytes()) as Uint8List;
+
+      setState(() {
+        profileImage = img;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -111,10 +110,10 @@ class SignupScreenState extends State<SignupScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            _profile_image != null ?
+            profileImage != null ?
                 CircleAvatar(
                   radius: 64,
-                  backgroundImage: MemoryImage(_profile_image as Uint8List),
+                  backgroundImage: MemoryImage(profileImage as Uint8List),
                 )
             :
             const CircleAvatar(

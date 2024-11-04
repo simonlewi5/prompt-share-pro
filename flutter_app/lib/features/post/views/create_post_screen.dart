@@ -58,28 +58,31 @@ class CreatePostScreenState extends State<CreatePostScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        List<String> selectedOptions = List.from(llmKind);
-
         return AlertDialog(
           title: const Text('Select LLM Models'),
           content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: llmOptions.map((option) {
-                return CheckboxListTile(
-                  title: Text(option),
-                  value: selectedOptions.contains(option),
-                  onChanged: (bool? selected) {
-                    setState(() {
-                      if (selected == true) {
-                        selectedOptions.add(option);
-                      } else {
-                        selectedOptions.remove(option);
-                      }
-                    });
-                  },
+            child: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setDialogState) {
+                return Column(
+                  children: llmOptions.map((option) {
+                    return CheckboxListTile(
+                      title: Text(option),
+                      value: llmKind.contains(option),
+                      onChanged: (bool? value) {
+                        setDialogState(() {
+                          setState(() {
+                            if (value == true) {
+                              llmKind.add(option);
+                            } else {
+                              llmKind.remove(option);
+                            }
+                          });
+                        });
+                      },
+                    );
+                  }).toList(),
                 );
-              }).toList(),
+              },
             ),
           ),
           actions: [
@@ -91,9 +94,6 @@ class CreatePostScreenState extends State<CreatePostScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                setState(() {
-                  llmKind = selectedOptions;
-                });
                 Navigator.pop(context);
               },
               child: const Text('Confirm'),
@@ -103,6 +103,7 @@ class CreatePostScreenState extends State<CreatePostScreen> {
       },
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -148,8 +149,7 @@ class CreatePostScreenState extends State<CreatePostScreen> {
   bool isFieldsValid() {
     String text = "";
 
-    if (titleController.text.isEmpty ||
-        contentController.text.isEmpty) {
+    if (titleController.text.isEmpty || contentController.text.isEmpty) {
       text = "Please fill out all fields!";
     } else if (llmKind.isEmpty) {
       text = "Please select at least one LLM model!";

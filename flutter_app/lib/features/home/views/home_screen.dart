@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_app/core/services/user_state.dart';
 import 'package:flutter_app/features/post/views/create_post_screen.dart';
 import 'package:flutter_app/features/post/views/post_list_screen.dart';
-import 'package:flutter_app/features/auth/views/profile_screen.dart';
+import 'package:flutter_app/features/user/views/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

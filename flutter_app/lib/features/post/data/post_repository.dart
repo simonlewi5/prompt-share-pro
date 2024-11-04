@@ -47,7 +47,7 @@ class PostRepository {
   Future<List<Post>> getAllPostsByUser(String email) async {
     String? token = await _getToken();
     final response = await http.get(
-      Uri.parse('$baseUrl/posts/$email'),
+      Uri.parse('$baseUrl/posts/user/$email'),
       headers: {
         'Authorization': 'Bearer $token',
         }

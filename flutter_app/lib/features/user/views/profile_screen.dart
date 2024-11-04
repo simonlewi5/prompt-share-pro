@@ -4,7 +4,7 @@ import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_app/core/services/user_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_app/features/post/views/user_posts_screen.dart';
+import 'package:flutter_app/features/user/views/user_posts_screen.dart';
 
 var logger = Logger();
 

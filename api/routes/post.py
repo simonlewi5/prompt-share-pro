@@ -56,6 +56,28 @@ def get_all_posts():
     except RuntimeError as e:
         return jsonify(message=f"Unexpected error: {str(e)}"), 500
 
+# Get all posts by a specific user
+@post_bp.route('/posts/<user_email>', methods=['GET'])
+@jwt_required()
+def get_post_by_user(user_email):
+    """
+    Get all posts by a specific user
+    """
+    try:
+        posts_ref = Post.db.collection('posts').where('author.email', '==', user_email).stream()
+        posts = []
+        for doc in posts_ref:
+            post = doc.to_dict()
+            post['id'] = doc.id
+            post.pop('user_ratings', None)
+            posts.append(post)
+        return jsonify(posts), 200
+    except GoogleAPICallError as e:
+        return jsonify(message=f"Error accessing Firestore: {str(e)}"), 500
+    except RuntimeError as e:
+        return jsonify(message=f"Unexpected error: {str(e)}"), 500
+
+
 # Get a post by its ID
 @post_bp.route('/posts/<post_id>', methods=['GET'])
 @jwt_required()

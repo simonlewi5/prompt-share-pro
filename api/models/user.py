@@ -13,7 +13,7 @@ class User:
     db = firestore.Client()
 
     @staticmethod
-    def create(email, username, usc_id, password):
+    def create(email, username, usc_id, password, profile_image):
         """
         Create a new user
         Raises:
@@ -31,7 +31,8 @@ class User:
                 'usc_id': usc_id,
                 'username': username,
                 'email': email,
-                'password': hashed_password
+                'password': hashed_password,
+                'profile_image': profile_image
             })
         except AlreadyExists as e:
             raise AlreadyExists(str(e)) from e

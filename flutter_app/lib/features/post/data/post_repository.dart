@@ -44,6 +44,23 @@ class PostRepository {
     }
   }
 
+  Future<List<Post>> getAllPostsByUser(String email) async {
+    String? token = await _getToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/posts/$email'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        }
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> jsonData = jsonDecode(response.body);
+      return jsonData.map((post) => Post.fromJson(post)).toList();
+    } else {
+      throw Exception('Failed to load posts by user');
+    }
+  }
+
   Future<http.Response> getPostById(String postId) async {
     String? token = await _getToken();
     final response = await http.get(

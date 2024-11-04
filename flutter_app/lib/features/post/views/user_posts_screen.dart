@@ -46,13 +46,27 @@ class UserPostsScreenState extends State<UserPostsScreen> {
       body: ListView.builder(
         itemCount: posts.length,
         itemBuilder: (context, index) {
+          final post = posts[index];
           return ListTile(
-            title: Text(posts[index].title),
-            subtitle: Text(posts[index].content),
+            title: Text(post.title),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('LLM Kind: ${post.llmKind.join(', ')}'),
+                if (post.authorNotes.isNotEmpty)
+                  Text('Author Notes: ${post.authorNotes}'),
+                if (post.averageRating != null &&
+                    post.totalRatings != null)
+                  Text(
+                      'Rating: ${post.averageRating?.toStringAsFixed(1)} (${post.totalRatings} ratings)'),
+              ],
+            ),
             onTap: () {
-              Navigator.of(context).push(
+              Navigator.push(
+                context,
                 MaterialPageRoute(
-                  builder: (context) => PostDetailScreen(postId: posts[index].id!),
+                  builder: (context) =>
+                      PostDetailScreen(postId: post.id!),
                 ),
               );
             },

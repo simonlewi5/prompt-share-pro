@@ -55,7 +55,7 @@ class CommentSectionState extends State<CommentSection> {
       final response = await commentRepository.createComment(widget.postId, newComment);
       if (response.statusCode == 201) {
         contentController.clear();
-        _fetchComments(); // Refresh comments after adding
+        _fetchComments();
       } else {
         logger.i('Failed to add comment');
       }

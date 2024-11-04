@@ -106,7 +106,7 @@ class PostDetailScreenState extends State<PostDetailScreen> {
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   TextSpan(
-                    text: '${post.author["username"] ?? 'Unknown'}',
+                    text: post.author["username"] ?? 'Unknown',
                     style: const TextStyle(fontStyle: FontStyle.italic),
                   ),
                 ],

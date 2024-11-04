@@ -88,7 +88,6 @@ class ProfileScreenState extends State<ProfileScreen> {
                       subtitle: Text(userState.email),
                     ),
                     ElevatedButton(
-                      // change width of button
                       onPressed: () {
                         Navigator.push(
                           context,

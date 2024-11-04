@@ -61,9 +61,7 @@ class EditPostScreenState extends State<EditPostScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        // Keep a separate list to manage the selection in the dialog
         List<String> selectedOptions = List.from(llmKind);
-
         return AlertDialog(
           title: const Text('Select LLM Models'),
           content: SingleChildScrollView(
@@ -82,9 +80,8 @@ class EditPostScreenState extends State<EditPostScreen> {
                           } else {
                             selectedOptions.remove(option);
                           }
-                          // Update the llmKind list in the main state
                           setState(() {
-                            llmKind = List.from(selectedOptions); // Keep the main state updated
+                            llmKind = List.from(selectedOptions);
                           });
                         });
                       },
@@ -103,7 +100,6 @@ class EditPostScreenState extends State<EditPostScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                // Just update the main state when the dialog closes
                 setState(() {
                   llmKind = List.from(selectedOptions);
                 });
@@ -116,7 +112,6 @@ class EditPostScreenState extends State<EditPostScreen> {
       },
     );
   }
-
 
   @override
   void dispose() {

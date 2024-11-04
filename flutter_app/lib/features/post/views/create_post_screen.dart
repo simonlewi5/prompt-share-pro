@@ -104,7 +104,6 @@ class CreatePostScreenState extends State<CreatePostScreen> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

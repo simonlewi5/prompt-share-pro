@@ -57,7 +57,7 @@ def get_all_posts():
         return jsonify(message=f"Unexpected error: {str(e)}"), 500
 
 # Get all posts by a specific user
-@post_bp.route('/posts/<user_email>', methods=['GET'])
+@post_bp.route('/posts/user/<user_email>', methods=['GET'])
 @jwt_required()
 def get_post_by_user(user_email):
     """

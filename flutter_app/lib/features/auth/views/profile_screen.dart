@@ -4,6 +4,7 @@ import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_app/core/services/user_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_app/features/post/views/user_posts_screen.dart';
 
 var logger = Logger();
 
@@ -41,33 +42,67 @@ class ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (String value) {
+              if (value == 'Edit Profile') {
+                // we have to add edit profile feature
+              } else if (value == 'Sign Out') {
+                signOut();
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              return {'Edit Profile', 'Sign Out'}.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                );
+              }).toList();
+            },
+          ),
+        ],
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Text(
-              'Welcome, ${userState.username}!',
-              style: const TextStyle(fontSize: 24),
-            ),
             Expanded(
-              child: ListView(
-                children: [
-                  ListTile(
-                    title: const Text('Username'),
-                    subtitle: Text(userState.username),
-                  ),
-                  ListTile(
-                    title: const Text('Email'),
-                    subtitle: Text(userState.email),
-                  ),
-                ],
+              flex: 1,
+              child: Container(
+                color: Colors.blue,
+                height: 100,
               ),
             ),
-            ElevatedButton(
-                onPressed: signOut,
-                child: const Text('Sign Out')
-            )
+            Expanded(
+              flex: 2,
+              child: SizedBox(
+                height: 200,
+                child: ListView(
+                  children: [
+                    ListTile(
+                      title: const Text('Username'),
+                      subtitle: Text(userState.username),
+                    ),
+                    ListTile(
+                      title: const Text('Email'),
+                      subtitle: Text(userState.email),
+                    ),
+                    ElevatedButton(
+                      // change width of button
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => UserPostsScreen(email: userState.email),
+                          ),
+                        );
+                      },
+                      child: const Text('View Your Posts'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),

@@ -7,15 +7,15 @@ class SignupRequest {
   final String username;
   final String uscId;
   final String password;
-  final String? profileImage;
+  final String profileImage;
 
   SignupRequest({
     required this.email,
     required this.username,
     required this.uscId,
     required this.password,
-    Uint8List? profileImage
-  }) : profileImage = profileImage != null ? base64Encode(profileImage) : null;
+    required this.profileImage
+  });
 
   Map<String, dynamic> toJson() {
     return {

@@ -1,5 +1,6 @@
 // signup_screen.dart
 import 'dart:convert';
+import 'dart:ffi';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
@@ -9,8 +10,9 @@ import 'package:flutter_app/features/auth/models/signup_request.dart';
 import 'package:flutter_app/features/auth/data/auth_repository.dart';
 import 'package:flutter_app/features/home/views/home_screen.dart';
 import 'package:flutter_app/core/services/user_state.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:flutter_app/snackBarMessage.dart';
+import 'package:flutter/material.dart';
+
 
 var logger = Logger();
 
@@ -26,7 +28,7 @@ class SignupScreenState extends State<SignupScreen> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController uscIdController = TextEditingController();
-  Uint8List? profileImage;
+  String? _profileImage;
   final AuthRepository authRepository = AuthRepository();
 
   void signup() async {
@@ -35,7 +37,7 @@ class SignupScreenState extends State<SignupScreen> {
       username: usernameController.text,
       password: passwordController.text,
       uscId: uscIdController.text,
-      profileImage: profileImage,
+      profileImage: _profileImage ?? 'image_2.jpg',
     );
 
     if (!verifyFields()) {
@@ -89,19 +91,6 @@ class SignupScreenState extends State<SignupScreen> {
     return false;
   }
 
-  void selectImage() async {
-    final ImagePicker _imagePicker = ImagePicker();
-    XFile? _file = await _imagePicker.pickImage(source: ImageSource.gallery);
-
-    if (_file != null) {
-      Uint8List img = (await _file.readAsBytes()) as Uint8List;
-
-      setState(() {
-        profileImage = img;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -110,21 +99,32 @@ class SignupScreenState extends State<SignupScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            profileImage != null ?
-                CircleAvatar(
-                  radius: 64,
-                  backgroundImage: MemoryImage(profileImage as Uint8List),
-                )
-            :
-            const CircleAvatar(
+            CircleAvatar(
               radius: 64,
-              backgroundImage: NetworkImage(
-                  'https://img.freepik.com/premium-vector/robot-circle-vector-icon_418020-452.jpg'),
+              backgroundImage: _profileImage != null
+                  ? AssetImage(_profileImage!)
+                  : const NetworkImage(
+                'https://img.freepik.com/premium-vector/robot-circle-vector-icon_418020-452.jpg',
+              ) as ImageProvider,
             ),
-            Positioned(
-              child: IconButton(
-                onPressed: selectImage,
-                icon: const Icon(Icons.add_a_photo),
+            Center(
+              child: GestureDetector(
+                onTap: () async {
+                  final selectedImagePath = await showDialog(
+                    context: context,
+                    builder: (context) => const GridPopup(),
+                  );
+                  if (selectedImagePath != null) {
+                    setState(() {
+                      _profileImage = selectedImagePath;
+                    });
+                  }
+                },
+                child: const Icon(
+                  Icons.add_a_photo,
+                  size: 32,
+                  color: Colors.grey,
+                ),
               ),
             ),
             TextField(
@@ -150,6 +150,70 @@ class SignupScreenState extends State<SignupScreen> {
               child: const Text('Signup'),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+
+class GridPopup extends StatelessWidget {
+  const GridPopup({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final List<String> imagePaths = [
+      'assets/images/image_1.webp',
+      'assets/images/image_2.jpg',
+      'assets/images/image_3.webp',
+      'assets/images/image_4.jpg',
+    ];
+
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: SizedBox(
+        width: 300,
+        height: 325,
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Select a Profile Picture',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Expanded(
+                child: GridView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 10,
+                    crossAxisSpacing: 10,
+                  ),
+                  itemCount: imagePaths.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context, imagePaths[index]);
+                      },
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.asset(
+                          imagePaths[index],
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

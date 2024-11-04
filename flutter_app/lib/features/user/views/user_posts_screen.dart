@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/features/post/models/post.dart';
 import 'package:flutter_app/features/post/data/post_repository.dart';
 import 'package:flutter_app/features/post/views/post_detail_screen.dart';
+import 'package:flutter_app/features/user/views/edit_post_screen.dart';
 import 'package:logger/logger.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 var logger = Logger();
 
@@ -23,10 +25,10 @@ class UserPostsScreenState extends State<UserPostsScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchPosts();
+    _refreshPosts();
   }
 
-  void _fetchPosts() async {
+  void _refreshPosts() async {
     try {
       final fetchedPosts = await postRepository.getAllPostsByUser(widget.email);
       setState(() {
@@ -47,29 +49,97 @@ class UserPostsScreenState extends State<UserPostsScreen> {
         itemCount: posts.length,
         itemBuilder: (context, index) {
           final post = posts[index];
-          return ListTile(
-            title: Text(post.title),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          return Slidable(
+            key: Key(post.id!),
+            endActionPane: ActionPane(
+              motion: const ScrollMotion(),
               children: [
-                Text('LLM Kind: ${post.llmKind.join(', ')}'),
-                if (post.authorNotes.isNotEmpty)
-                  Text('Author Notes: ${post.authorNotes}'),
-                if (post.averageRating != null &&
-                    post.totalRatings != null)
-                  Text(
-                      'Rating: ${post.averageRating?.toStringAsFixed(1)} (${post.totalRatings} ratings)'),
+                SlidableAction(
+                  onPressed: (context) async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditPostScreen(postId: post.id!),
+                      ),
+                    );
+                    if (result == true) {
+                      _refreshPosts();
+                    }
+                  },
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  icon: Icons.edit,
+                  label: 'Edit',
+                ),
+                SlidableAction(
+                  onPressed: (context) async {
+                    bool? confirmDelete = await showDialog<bool>(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text('Confirm Delete'),
+                          content: const Text('Are you sure you want to delete this post?'),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop(false);
+                              },
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop(true);
+                              },
+                              child: const Text('Delete'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+
+                    if (confirmDelete == true) {
+                      try {
+                        await postRepository.deletePost(post.id!);
+                        setState(() {
+                          posts.removeAt(index);
+                        });
+
+                        logger.i('${post.title} deleted');
+                      } catch (e) {
+                        logger.e('Failed to delete post: $e');
+                      }
+                    }
+                  },
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                  icon: Icons.delete,
+                  label: 'Delete',
+                ),
               ],
             ),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      PostDetailScreen(postId: post.id!),
-                ),
-              );
-            },
+            child: ListTile(
+              title: Text(post.title),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('LLM Kind: ${post.llmKind.join(', ')}'),
+                  if (post.authorNotes.isNotEmpty)
+                    Text('Author Notes: ${post.authorNotes}'),
+                  if (post.averageRating != null && post.totalRatings != null)
+                    Text(
+                      'Rating: ${post.averageRating?.toStringAsFixed(1)} (${post.totalRatings} ratings)',
+                    ),
+                ],
+              ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PostDetailScreen(postId: post.id!),
+                  ),
+                );
+              },
+            ),
           );
         },
       ),

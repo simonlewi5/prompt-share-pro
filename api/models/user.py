@@ -5,7 +5,6 @@ User model for handling user creation, retrieval, and password validation in the
 from google.cloud import firestore
 from google.api_core.exceptions import GoogleAPICallError, NotFound, AlreadyExists
 from werkzeug.security import generate_password_hash, check_password_hash
-import base64
 
 class User:
     """
@@ -14,7 +13,7 @@ class User:
     db = firestore.Client()
 
     @staticmethod
-    def create(email, username, usc_id, password, profile_image):
+    def create(email, username, usc_id, password):
         """
         Create a new user
         Raises:
@@ -32,8 +31,7 @@ class User:
                 'usc_id': usc_id,
                 'username': username,
                 'email': email,
-                'password': hashed_password,
-                'profile_image': profile_image
+                'password': hashed_password
             })
         except AlreadyExists as e:
             raise AlreadyExists(str(e)) from e

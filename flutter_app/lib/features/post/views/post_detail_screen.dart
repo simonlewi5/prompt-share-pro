@@ -56,9 +56,10 @@ class PostDetailScreenState extends State<PostDetailScreen> {
 
   void _checkIfRated() async {
     try {
-      bool result = await postRepository.hasRatedPost(widget.postId);
+      final result = await postRepository.hasRatedPost(widget.postId);
       setState(() {
-        hasRated = result;
+        hasRated = result['has_rated'];
+        userRating = result['user_rating'];
       });
     } catch (e) {
       logger.e('Error checking if rated: $e');
@@ -122,10 +123,15 @@ class PostDetailScreenState extends State<PostDetailScreen> {
               Text('Author Notes: ${post.authorNotes}'),
             const SizedBox(height: 20),
             if (post.averageRating != null)
-              Text('Average Rating: ${post.averageRating?.toStringAsFixed(1)}'),
+              Text('Average Rating: ${post.averageRating?.toStringAsFixed(1)}')
+            else
+              const Text(
+                'This post has not been rated yet.',
+                style: const TextStyle(fontStyle: FontStyle.italic),
+              ),
             const SizedBox(height: 10),
             if (hasRated)
-              Text('You rated this post: $userRating')
+              Text('You have rated this post: $userRating')
             else
               Row(
                 children: [

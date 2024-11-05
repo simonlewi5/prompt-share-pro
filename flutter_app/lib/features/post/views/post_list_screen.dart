@@ -39,14 +39,17 @@ class PostListScreenState extends State<PostListScreen> {
   void _fetchPosts() async {
     try {
       final fetchedPosts = await postRepository.getAllPosts();
-      setState(() {
-        posts = fetchedPosts;
-        filteredPosts = posts;
-      });
+      if (mounted) {
+        setState(() {
+          posts = fetchedPosts;
+          filteredPosts = posts;
+        });
+      }
     } catch (e) {
       logger.e('Failed to load posts: $e');
     }
   }
+
 
   void _onSearchChanged() {
     setState(() {
@@ -162,7 +165,7 @@ class PostListScreenState extends State<PostListScreen> {
                           if (post.averageRating != null &&
                               post.totalRatings != null)
                             Text(
-                                'Rating: ${post.averageRating?.toStringAsFixed(1)} (${post.totalRatings} ratings)'),
+                                'Rating: ${post.averageRating?.toStringAsFixed(1)} <${post.totalRatings} rating(s)>'),
                         ],
                       ),
                       onTap: () {

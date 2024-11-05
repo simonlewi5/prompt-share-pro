@@ -94,6 +94,38 @@ class Post:
             raise RuntimeError(f"Unexpected error: {str(e)}") from e
 
     @staticmethod
+    def update_rating(post_id, user_email, user_rating, total_points, total_ratings):
+        """
+        Update a post's rating
+        Raises:
+            NotFound: if post with post_id not found
+            GoogleAPICallError: if Firestore error occurs
+            Exception: if unexpected error occurs
+        """
+        try:
+            post_ref = Post.db.collection('posts').document(post_id)
+            updates = {}
+            if user_email:
+                updates["has_rated"] = user_email
+            if user_rating:
+                updates['user_ratings'] = user_rating
+            if total_points:
+                updates['total_points'] = total_points
+            if total_ratings:
+                updates['total_ratings'] = total_ratings
+            if updates:
+                updates['updated_at'] = datetime.utcnow()
+                post_ref.update(updates)
+            return True
+        except NotFound as e:
+            raise NotFound(f"Post with ID {post_id} not found.") from e
+        except GoogleAPICallError as e:
+            raise GoogleAPICallError(f"Firestore error while updating post: {str(e)}") from e
+        except Exception as e:
+            raise RuntimeError(f"Unexpected error: {str(e)}") from e
+
+
+    @staticmethod
     def delete(post_id):
         """
         Delete a post by its ID

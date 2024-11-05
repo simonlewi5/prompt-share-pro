@@ -132,6 +132,38 @@ def update_post(post_id):
 
     return jsonify(message="Post updated"), 200
 
+@post_bp.route('posts/update/rating/<post_id>', methods=['PUT'])
+@jwt_required()
+def update_rating(post_id):
+    """
+    Update a post's rating by its ID
+    Adds the user's rating to the post's total ratings and points
+    """
+    data = request.get_json()
+    user_email = get_jwt_identity().get('email')
+
+    user_email = data.get('user_email')
+    user_rating = data.get('user_ratings')
+    total_points = data.get('total_points')
+    total_ratings = data.get('total_ratings')
+
+    if not user_rating:
+        return jsonify(message="Rating is required"), 400
+
+    try:
+        Post.update_rating(post_id, user_email, user_rating, total_points, total_ratings)
+    except NotFound:
+        exception_found = jsonify(message="Post not found"), 404
+    except GoogleAPICallError as e:
+        exception_found = jsonify(message=f"Error updating post in Firestore: {str(e)}"), 500
+    except RuntimeError as e:
+        exception_found = jsonify(message=f"Unexpected error: {str(e)}"), 500
+    
+    if exception_found:
+        return exception_found
+    
+    return jsonify(message="Post rating updated"), 200
+
 # Delete a post by its ID
 @post_bp.route('/posts/<post_id>', methods=['DELETE'])
 @jwt_required()

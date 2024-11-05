@@ -185,7 +185,7 @@ def has_rated(post_id):
     """
     Check if the current user has already rated a post
     """
-    user_email = get_jwt_identity().get('email') # need to check this, i believe it returns both email and username
+    user_email = get_jwt_identity().get('email')
 
     try:
         post = Post.get_by_id(post_id)

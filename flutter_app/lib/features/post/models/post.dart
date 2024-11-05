@@ -57,12 +57,4 @@ class Post {
     );
   }
 
-  static Future<bool> hasUserRated(String postId, String userEmail) async {
-    final PostRepository postRepository = PostRepository();
-    try {
-      return await postRepository.hasRatedPost(postId);
-    } catch (e) {
-      return false;
-    }
-  }
 }

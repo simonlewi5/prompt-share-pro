@@ -1,7 +1,5 @@
 // signup_screen.dart
 import 'dart:convert';
-import 'dart:ffi';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
@@ -11,8 +9,6 @@ import 'package:flutter_app/features/auth/data/auth_repository.dart';
 import 'package:flutter_app/features/home/views/home_screen.dart';
 import 'package:flutter_app/core/services/user_state.dart';
 import 'package:flutter_app/snackBarMessage.dart';
-import 'package:flutter/material.dart';
-
 
 var logger = Logger();
 
@@ -155,7 +151,6 @@ class SignupScreenState extends State<SignupScreen> {
     );
   }
 }
-
 
 class GridPopup extends StatelessWidget {
   const GridPopup({super.key});

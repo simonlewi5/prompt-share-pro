@@ -5,6 +5,9 @@ import 'package:provider/provider.dart';
 import 'package:flutter_app/core/services/user_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_app/features/user/views/user_posts_screen.dart';
+import 'package:flutter_app/features/user/models/user.dart';
+import 'package:flutter_app/features/user/data/user_repository.dart';
+import 'package:flutter_app/features/user/views/edit_profile_screen.dart';
 
 var logger = Logger();
 
@@ -16,15 +19,35 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class ProfileScreenState extends State<ProfileScreen> {
+  final UserRepository userRepository = UserRepository();
+  User? user;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUser();
+  }
+
+  void _fetchUser() async {
+    try {
+      final userState = Provider.of<UserState>(context, listen: false);
+      User fetchedUser = await userRepository.getUserByEmail(userState.email);
+
+      if (mounted) {
+        setState(() {
+          user = fetchedUser;
+        });
+      }
+    } catch (e) {
+      logger.e("Failed to fetch user data: $e");
+    }
+  }
 
   void signOut() async {
     final userState = Provider.of<UserState>(context, listen: false);
-
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('jwt_token');
-
     userState.clearUserData();
-
     logger.i("User signed out successfully");
 
     if (mounted) {
@@ -38,7 +61,6 @@ class ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final userState = Provider.of<UserState>(context);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
@@ -46,7 +68,17 @@ class ProfileScreenState extends State<ProfileScreen> {
           PopupMenuButton<String>(
             onSelected: (String value) {
               if (value == 'Edit Profile') {
-                // we have to add edit profile feature
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EditProfileScreen(user: user!),
+                  ),
+                ).then((shouldRefresh) {
+                  if (shouldRefresh == true) {
+                    _fetchUser();
+                  }
+                }
+                );
               } else if (value == 'Sign Out') {
                 signOut();
               }
@@ -68,9 +100,23 @@ class ProfileScreenState extends State<ProfileScreen> {
           children: [
             Expanded(
               flex: 1,
-              child: Container(
-                color: Colors.blue,
-                height: 100,
+              child: CircleAvatar(
+                radius: 200,
+                backgroundColor: Colors.transparent,
+                child: ClipOval(
+                  child: user?.profileImage != null
+                      ? Image.asset(
+                    user!.profileImage!,
+                    width: 200,
+                    height: 200,
+                    fit: BoxFit.cover,
+                  )
+                      : const Icon(
+                    Icons.person,
+                    size: 50,
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ),
             Expanded(
@@ -81,11 +127,11 @@ class ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     ListTile(
                       title: const Text('Username'),
-                      subtitle: Text(userState.username),
+                      subtitle: Text(user?.userName ?? 'Loading...'),
                     ),
                     ListTile(
                       title: const Text('Email'),
-                      subtitle: Text(userState.email),
+                      subtitle: Text(user?.userEmail ?? 'Loading...'),
                     ),
                     ElevatedButton(
                       onPressed: () {
@@ -108,3 +154,4 @@ class ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
+

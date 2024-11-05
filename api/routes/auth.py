@@ -82,11 +82,9 @@ def login():
 
     exception_found = None
 
-    # Validate input
     if not email or not password:
         exception_found = jsonify(message="Email and password are required"), 400
 
-    # Check if user exists and validate password
     try:
         user = User.get_by_email(email)
         if not user or not User.check_password(user['password'], password):
@@ -126,3 +124,33 @@ def get_user(email):
         return jsonify({'message': f"Error retrieving user: {str(e)}"}), 500
     except RuntimeError as e:
         return jsonify({'message': f"Unexpected error: {str(e)}"}), 500
+    
+# Update user by email
+@auth_bp.route('/users/<email>', methods=['PUT'])
+def update_user(email):
+    """
+    Update user by email
+    """
+    data = request.get_json()
+
+    username = data.get('username')
+    profile_image = data.get('profile_image')
+
+    exception_found = None
+
+    if not username:
+        exception_found = jsonify(message="Username is required"), 400
+
+    try:
+        User.update(email, username=username, profile_image=profile_image)
+    except NotFound:
+        exception_found = jsonify(message="User not found"), 404
+    except GoogleAPICallError as e:
+        exception_found = jsonify(message=f"Error updating user in Firestore: {str(e)}"), 500
+    except RuntimeError as e:
+        exception_found = jsonify(message=f"Unexpected error: {str(e)}"), 500
+
+    if exception_found:
+        return exception_found
+
+    return jsonify(message="User updated successfully"), 200

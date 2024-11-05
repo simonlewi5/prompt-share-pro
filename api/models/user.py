@@ -68,3 +68,27 @@ class User:
         Check if provided password matches stored password
         """
         return check_password_hash(stored_password, provided_password)
+    
+    @staticmethod
+    def update(email, username, profile_image):
+        """
+        Update user
+        Raises:
+            NotFound: if user with email not found
+            GoogleAPICallError: if Firestore error occurs
+            Exception: if unexpected error occurs
+        """
+        try:
+            user_ref = User.db.collection('users').document(email)
+            if not user_ref.get().exists:
+                raise NotFound(f"User with email {email} not found.")
+            user_ref.update({
+                'username': username,
+                'profile_image': profile_image
+            })
+        except NotFound as e:
+            raise NotFound(str(e)) from e
+        except GoogleAPICallError as e:
+            raise GoogleAPICallError(f"Firestore error while updating user: {str(e)}") from e
+        except Exception as e:
+            raise RuntimeError(f"Unexpected error: {str(e)}") from e

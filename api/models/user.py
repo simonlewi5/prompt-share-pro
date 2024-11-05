@@ -14,7 +14,6 @@ class User:
 
     @staticmethod
     def create(email, username, usc_id, password, profile_image):
-        print(profile_image)
         """
         Create a new user
         Raises:

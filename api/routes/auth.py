@@ -21,16 +21,6 @@ def signup():
     """
     Create a new user
     """
-
-    # Logging configuration
-    log_dir = "logs"
-    os.makedirs(log_dir, exist_ok=True)  # Ensure log directory exists
-    logging.basicConfig(
-        filename=os.path.join(log_dir, "auth.log"),
-        level=logging.INFO,
-        format="%(asctime)s - %(levelname)s - %(message)s"
-    )
-
     data = request.get_json()
 
     usc_id = data.get('usc_id')
@@ -38,8 +28,6 @@ def signup():
     email = data.get('email')
     password = data.get('password')
     profile_image = data.get('profile_image')
-
-    logging.info("Signup data received: %s", data)
 
     exception_found = None
 
@@ -62,7 +50,7 @@ def signup():
 
     # Create user
     try:
-        User.create(email, username, usc_id, password)
+        User.create(email, username, usc_id, password, profile_image)
         user = User.get_by_email(email)
     except AlreadyExists:
         exception_found = jsonify(message="User already exists"), 400

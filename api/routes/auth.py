@@ -143,6 +143,7 @@ def update_user(email):
 
     try:
         User.update(email, username=username, profile_image=profile_image)
+        user = User.get_by_email(email)
     except NotFound:
         exception_found = jsonify(message="User not found"), 404
     except GoogleAPICallError as e:
@@ -152,5 +153,12 @@ def update_user(email):
 
     if exception_found:
         return exception_found
+    
+    claims = {
+        'username': user['username'],
+        'email': user['email'],
+    }
+    expires = timedelta(days=1)
 
-    return jsonify(message="User updated successfully"), 200
+    access_token = create_access_token(identity=claims, expires_delta=expires)
+    return jsonify(access_token=access_token), 200

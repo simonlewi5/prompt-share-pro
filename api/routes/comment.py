@@ -16,7 +16,7 @@ def create(post_id):
     Add a comment to a post
     """
     data = request.get_json()
-    author = data.get('author')
+    author = get_jwt_identity()
     content = data.get('content')
 
     if not content:

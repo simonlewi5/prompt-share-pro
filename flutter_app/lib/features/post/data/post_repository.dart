@@ -111,7 +111,7 @@ class PostRepository {
     return response;
   }
 
-  Future<bool> hasRatedPost(String postId) async {
+  Future<Map<String, dynamic>> hasRatedPost(String postId) async {
     String? token = await _getToken();
     final response = await http.get(
       Uri.parse('$baseUrl/posts/$postId/has_rated'),
@@ -122,7 +122,10 @@ class PostRepository {
 
     if (response.statusCode == 200) {
       var jsonResponse = jsonDecode(response.body);
-      return jsonResponse['has_rated'] ?? false;
+      return {
+        'has_rated': jsonResponse['has_rated'] ?? false,
+        'user_rating': jsonResponse['rating']
+      };
     } else {
       throw Exception('Failed to check if user has rated the post');
     }

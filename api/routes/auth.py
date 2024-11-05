@@ -26,6 +26,8 @@ def signup():
     username = data.get('username')
     email = data.get('email')
     password = data.get('password')
+    profile_image = data.get('profile_image')
+    print(data)
 
     exception_found = None
 

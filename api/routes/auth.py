@@ -5,12 +5,22 @@ Authentication routes
 """
 
 from datetime import timedelta
-from flask import Blueprint, request, jsonify
+import os
+from flask import Blueprint, logging, request, jsonify
 from google.cloud import firestore
 from google.api_core.exceptions import GoogleAPICallError, NotFound, AlreadyExists
 from flask_jwt_extended import create_access_token
 from api.models.user import User
 from api.utils.validators import is_valid_usc_email, is_valid_usc_id
+
+# Logging configuration
+log_dir = "logs"
+os.makedirs(log_dir, exist_ok=True)  # Ensure log directory exists
+logging.basicConfig(
+    filename=os.path.join(log_dir, "auth.log"),
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 auth_bp = Blueprint('auth', __name__)
 db = firestore.Client()
@@ -27,7 +37,8 @@ def signup():
     email = data.get('email')
     password = data.get('password')
     profile_image = data.get('profile_image')
-    print(data)
+    
+    logging.info("Signup data received: %s", data)
 
     exception_found = None
 

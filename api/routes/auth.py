@@ -110,3 +110,19 @@ def login():
 
     access_token = create_access_token(identity=claims, expires_delta=expires)
     return jsonify(access_token=access_token), 200
+
+# Get user by email
+@auth_bp.route('/users/<email>', methods=['GET'])
+def get_user(email):
+    """
+    Get user by email
+    """
+    try:
+        user = User.get_by_email(email)
+        return jsonify(user), 200
+    except NotFound as e:
+        return jsonify({'message': str(e)}), 404
+    except GoogleAPICallError as e:
+        return jsonify({'message': f"Error retrieving user: {str(e)}"}), 500
+    except RuntimeError as e:
+        return jsonify({'message': f"Unexpected error: {str(e)}"}), 500

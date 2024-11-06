@@ -73,6 +73,7 @@ class User:
     def update(email, username, profile_image):
         """
         Update user
+        Updates username under comments
         Raises:
             NotFound: if user with email not found
             GoogleAPICallError: if Firestore error occurs
@@ -86,6 +87,21 @@ class User:
                 'username': username,
                 'profile_image': profile_image
             })
+
+            posts_ref = User.db.collection('posts')
+            posts = posts_ref.stream()
+
+            for post in posts:
+                comments_ref = post.reference.collection('comments')
+                comments = comments_ref.stream()
+
+                for comment in comments:
+                    comment_data = comment.to_dict()
+                    if comment_data.get('author', {}).get('email') == email:
+                        comment.reference.update({
+                            'author.username': username
+                        })
+
         except NotFound as e:
             raise NotFound(str(e)) from e
         except GoogleAPICallError as e:

@@ -27,6 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.grey[500],
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.list),

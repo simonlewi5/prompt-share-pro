@@ -64,14 +64,65 @@ class CommentSectionState extends State<CommentSection> {
     }
   }
 
+  void _showAddCommentDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.grey[400],
+          title: const Text('Add a comment'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: contentController,
+                decoration: const InputDecoration(
+                  labelText: 'Enter your comment...',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 10),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                _addComment();
+                Navigator.of(context).pop();
+              },
+              child: const Text('Submit'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Comments',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        const SizedBox(height: 20),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Comments',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: _showAddCommentDialog,
+              tooltip: 'Add Comment',
+            ),
+          ],
         ),
         const SizedBox(height: 10),
         isLoading
@@ -84,24 +135,23 @@ class CommentSectionState extends State<CommentSection> {
           itemCount: comments.length,
           itemBuilder: (context, index) {
             final comment = comments[index];
-            return ListTile(
-              title: Text('${comment.author['username']} (${comment.author['email']})'),
-              subtitle: Text(comment.content),
+            return Container(
+              margin: const EdgeInsets.symmetric(vertical: 8.0),
+              padding: const EdgeInsets.all(5.0),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(8.0),
+                border: Border.all(color: Colors.grey, width: 1),
+              ),
+              child: ListTile(
+                title: Text(
+                  '${comment.author['username']} (${comment.author['email']})',
+                  style: const TextStyle(fontSize: 15),
+                ),
+                subtitle: Text(comment.content),
+              ),
             );
           },
-        ),
-        const SizedBox(height: 20),
-        TextField(
-          controller: contentController,
-          decoration: const InputDecoration(
-            labelText: 'Add a comment...',
-            border: OutlineInputBorder(),
-          ),
-        ),
-        const SizedBox(height: 10),
-        ElevatedButton(
-          onPressed: _addComment,
-          child: const Text('Submit'),
         ),
       ],
     );

@@ -9,6 +9,7 @@ import 'package:flutter_app/features/auth/data/auth_repository.dart';
 import 'package:flutter_app/features/home/views/home_screen.dart';
 import 'package:flutter_app/core/services/user_state.dart';
 import 'package:flutter_app/snackBarMessage.dart';
+import 'package:lottie/lottie.dart';
 
 var logger = Logger();
 
@@ -33,7 +34,7 @@ class SignupScreenState extends State<SignupScreen> {
       username: usernameController.text,
       password: passwordController.text,
       uscId: uscIdController.text,
-      profileImage: _profileImage ?? 'image_2.jpg',
+      profileImage: _profileImage ?? 'assets/images/image_2.jpg',
     );
 
     if (!verifyFields()) {
@@ -54,15 +55,38 @@ class SignupScreenState extends State<SignupScreen> {
       if (mounted) {
         Provider.of<UserState>(context, listen: false).setToken(token);
 
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-              (Route<dynamic> route) => false,
-        );
+        snackBarMessage(context, 'Welcome to PromptShare ${usernameController.text}!');
+
+        showSignUpAnimation();
       }
     } else {
       logger.e("Signup failed: ${response.statusCode}");
       logger.d("Response body: ${response.body}");
     }
+  }
+
+  void showSignUpAnimation() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Center(
+          child: Lottie.asset(
+            'assets/lottie/checkmark.json',
+            repeat: false,
+            onLoaded: (composition) {
+              Future.delayed(composition.duration, () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const HomeScreen()),
+                      (Route<dynamic> route) => false,
+                );
+              });
+            },
+          ),
+        );
+      },
+    );
   }
 
   bool verifyFields() {

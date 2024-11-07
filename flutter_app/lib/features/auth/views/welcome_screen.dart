@@ -9,7 +9,6 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Welcome')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -33,6 +32,7 @@ class WelcomeScreen extends StatelessWidget {
               },
               child: const Text('Login'),
             ),
+            SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(

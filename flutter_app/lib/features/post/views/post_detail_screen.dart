@@ -74,12 +74,23 @@ class PostDetailScreenState extends State<PostDetailScreen> {
         setState(() {
           userRating = rating;
           hasRated = true;
+          _fetchPost();
         });
       } else {
         logger.e('Failed to rate post: ${response.statusCode}');
       }
     } catch (e) {
       logger.e('Failed to rate post: $e');
+    }
+  }
+
+  Color _getRatingColor(double rating) {
+    if (rating >= 4) {
+      return Colors.green;
+    } else if (rating >= 2) {
+      return Colors.yellow;
+    } else {
+      return Colors.red;
     }
   }
 
@@ -94,9 +105,37 @@ class PostDetailScreenState extends State<PostDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              post.title,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            Row(
+              children: [
+                Flexible(
+                  child: Text(
+                    post.title,
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                if (post.averageRating != null)
+                  Row(
+                    children: [
+                      Text(
+                        post.averageRating!.toStringAsFixed(1),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                      Icon(
+                          Icons.star,
+                          color: _getRatingColor(post.averageRating!)
+                      ),
+                    ],
+                  )
+                else
+                  const Text(
+                    'This post has not been rated yet.',
+                    style: TextStyle(fontStyle: FontStyle.italic),
+                  ),
+              ],
             ),
             const SizedBox(height: 10),
             Text.rich(
@@ -117,21 +156,26 @@ class PostDetailScreenState extends State<PostDetailScreen> {
             const SizedBox(height: 10),
             Text('LLM Kind: ${post.llmKind.join(', ')}'),
             const SizedBox(height: 10),
-            Text(post.content),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.grey.shade300,
+                  width: 3.0,
+                ),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(post.content),
+            ),
             const SizedBox(height: 10),
             if (post.authorNotes.isNotEmpty)
               Text('Author Notes: ${post.authorNotes}'),
-            const SizedBox(height: 20),
-            if (post.averageRating != null)
-              Text('Average Rating: ${post.averageRating?.toStringAsFixed(1)}')
-            else
-              const Text(
-                'This post has not been rated yet.',
-                style: const TextStyle(fontStyle: FontStyle.italic),
-              ),
             const SizedBox(height: 10),
             if (hasRated)
-              Text('You have rated this post: $userRating')
+              Text(
+                  'You have rated this post: $userRating',
+                  style: const TextStyle(fontStyle: FontStyle.italic),
+              )
             else
               Row(
                 children: [

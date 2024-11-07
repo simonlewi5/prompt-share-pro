@@ -8,6 +8,7 @@ import 'package:flutter_app/features/user/views/user_posts_screen.dart';
 import 'package:flutter_app/features/user/models/user.dart';
 import 'package:flutter_app/features/user/data/user_repository.dart';
 import 'package:flutter_app/features/user/views/edit_profile_screen.dart';
+import 'package:lottie/lottie.dart';
 
 var logger = Logger();
 
@@ -25,6 +26,7 @@ class ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
+    final userState = Provider.of<UserState>(context, listen: false);
     _fetchUser();
   }
 
@@ -50,12 +52,29 @@ class ProfileScreenState extends State<ProfileScreen> {
     userState.clearUserData();
     logger.i("User signed out successfully");
 
-    if (mounted) {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const WelcomeScreen()),
-            (Route<dynamic> route) => false,
-      );
-    }
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Center(
+          child: Lottie.asset(
+                'assets/lottie/signout.json',
+                repeat: false,
+                onLoaded: (composition) {
+                  Future.delayed(composition.duration, () {
+                    Navigator.of(context).pop();
+                    if (mounted) {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+                            (Route<dynamic> route) => false,
+                      );
+                    }
+                  });
+                },
+              ),
+        );
+      },
+    );
   }
 
   @override
@@ -100,25 +119,39 @@ class ProfileScreenState extends State<ProfileScreen> {
           children: [
             Expanded(
               flex: 1,
-              child: CircleAvatar(
-                radius: 200,
-                backgroundColor: Colors.transparent,
-                child: ClipOval(
-                  child: user?.profileImage != null
-                      ? Image.asset(
-                    user!.profileImage!,
-                    width: 200,
-                    height: 200,
-                    fit: BoxFit.cover,
-                  )
-                      : const Icon(
-                    Icons.person,
-                    size: 50,
-                    color: Colors.white,
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      spreadRadius: 4,
+                      blurRadius: 20,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: CircleAvatar(
+                  radius: 100,
+                  backgroundColor: Colors.transparent,
+                  child: ClipOval(
+                    child: user?.profileImage != null
+                        ? Image.asset(
+                      user!.profileImage!,
+                      width: 200,
+                      height: 200,
+                      fit: BoxFit.cover,
+                    )
+                        : const Icon(
+                      Icons.person,
+                      size: 50,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
             ),
+
             Expanded(
               flex: 2,
               child: SizedBox(
@@ -126,14 +159,18 @@ class ProfileScreenState extends State<ProfileScreen> {
                 child: ListView(
                   children: [
                     ListTile(
-                      title: const Text('Username'),
-                      subtitle: Text(user?.userName ?? 'Loading...'),
+                      title: const Text('Username', style: const TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text(userState.username),
                     ),
                     ListTile(
-                      title: const Text('Email'),
-                      subtitle: Text(user?.userEmail ?? 'Loading...'),
+                      title: const Text('Email', style: const TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text(userState.email),
                     ),
                     ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey[350],
+                        foregroundColor: Colors.lightBlue,
+                      ),
                       onPressed: () {
                         Navigator.push(
                           context,

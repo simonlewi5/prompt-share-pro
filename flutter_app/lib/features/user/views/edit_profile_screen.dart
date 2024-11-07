@@ -124,6 +124,10 @@ class EditProfileScreenState extends State<EditProfileScreen> {
             ),
             ElevatedButton(
               onPressed: _saveChanges,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey[350],
+                foregroundColor: Colors.lightBlue,
+              ),
               child: const Text('Save Changes'),
             ),
           ],

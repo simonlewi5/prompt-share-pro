@@ -59,6 +59,7 @@ class CreatePostScreenState extends State<CreatePostScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.grey[400],
           title: const Text('Select LLM Models'),
           content: SingleChildScrollView(
             child: StatefulBuilder(
@@ -119,6 +120,10 @@ class CreatePostScreenState extends State<CreatePostScreen> {
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: _showLLMSelectionDialog,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey[350],
+                foregroundColor: Colors.lightBlue,
+              ),
               child: Text(
                 llmKind.isEmpty ? 'Select LLM Models' : 'Selected: ${llmKind.join(', ')}',
               ),
@@ -126,7 +131,7 @@ class CreatePostScreenState extends State<CreatePostScreen> {
             TextField(
               controller: contentController,
               decoration: const InputDecoration(labelText: 'Content'),
-              maxLines: 6,
+              maxLines: 4,
             ),
             TextField(
               controller: authorNotesController,
@@ -136,6 +141,10 @@ class CreatePostScreenState extends State<CreatePostScreen> {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: createPost,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey[350],
+                foregroundColor: Colors.lightBlue,
+              ),
               child: const Text('Create Post'),
             ),
             const SizedBox(height: 20),

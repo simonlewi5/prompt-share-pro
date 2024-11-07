@@ -69,6 +69,16 @@ class PostListScreenState extends State<PostListScreen> {
     });
   }
 
+  Color _getRatingColor(double rating) {
+    if (rating >= 4) {
+      return Colors.green;
+    } else if (rating >= 2) {
+      return Colors.yellow;
+    } else {
+      return Colors.red;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -154,34 +164,80 @@ class PostListScreenState extends State<PostListScreen> {
                   itemCount: filteredPosts.length,
                   itemBuilder: (context, index) {
                     final post = filteredPosts[index];
-                    return ListTile(
-                      title: Text(post.title),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('LLM Kind: ${post.llmKind.join(', ')}'),
-                          if (post.authorNotes.isNotEmpty)
-                            Text('Author Notes: ${post.authorNotes}'),
-                          if (post.averageRating != null &&
-                              post.totalRatings != null)
-                            Text(
-                                'Rating: ${post.averageRating?.toStringAsFixed(1)} <${post.totalRatings} rating(s)>'),
-                        ],
+                    return Container(
+                      margin: const EdgeInsets.symmetric(vertical: 5.0),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                            color: Colors.grey.shade300,
+                            width: 3.0,
+                        ),
+                        borderRadius: BorderRadius.circular(8.0),
                       ),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                PostDetailScreen(postId: post.id!),
-                          ),
-                        );
-                      },
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    post.title,
+                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                                  Text('LLM Kind: ${post.llmKind.join(', ')}'),
+                                  if (post.authorNotes.isNotEmpty)
+                                    Text('Author Notes: ${post.authorNotes}'),
+                                ],
+                              ),
+                            ),
+                            if (post.averageRating != null && post.totalRatings != null)
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.star,
+                                        color: _getRatingColor(post.averageRating!),
+                                        size: 25,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        post.averageRating!.toStringAsFixed(1),
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Text(
+                                    '${post.totalRatings} review(s)',
+                                    style: const TextStyle(fontStyle: FontStyle.italic),
+                                  ),
+                                ],
+                              ),
+                          ],
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PostDetailScreen(postId: post.id!),
+                            ),
+                          ).then((_) {
+                            _fetchPosts();
+                          });
+                        },
+                      ),
                     );
                   },
                 ),
-              ),
-              const SizedBox(height: 20),
+              )
             ],
           ),
         ),

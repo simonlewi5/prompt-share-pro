@@ -9,6 +9,7 @@ import 'package:flutter_app/features/auth/data/auth_repository.dart';
 import 'package:flutter_app/features/home/views/home_screen.dart';
 import 'package:flutter_app/core/services/user_state.dart';
 import 'package:flutter_app/snackBarMessage.dart';
+import 'package:lottie/lottie.dart';
 
 var logger = Logger();
 
@@ -46,15 +47,36 @@ class LoginScreenState extends State<LoginScreen> {
 
         snackBarMessage(context, "Welcome back ${userState.username}!");
 
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-              (Route<dynamic> route) => false,
-        );
+        showLoginAnimation();
       }
     } else {
       logger.e("Login failed: ${response.statusCode}");
       logger.d("Response body: ${response.body}");
     }
+  }
+
+  void showLoginAnimation() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Center(
+          child: Lottie.asset(
+            'assets/lottie/checkmark.json',
+            repeat: false,
+            onLoaded: (composition) {
+              Future.delayed(composition.duration, () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const HomeScreen()),
+                      (Route<dynamic> route) => false,
+                );
+              });
+            },
+          ),
+        );
+      },
+    );
   }
 
   @override

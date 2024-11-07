@@ -177,24 +177,40 @@ class PostDetailScreenState extends State<PostDetailScreen> {
                   style: const TextStyle(fontStyle: FontStyle.italic),
               )
             else
-              Row(
+              Column(
                 children: [
-                  const Text('Rate this post:'),
-                  const SizedBox(width: 10),
-                  DropdownButton<int>(
-                    value: userRating,
-                    hint: const Text('Select Rating'),
-                    items: [1, 2, 3, 4, 5].map((int value) {
-                      return DropdownMenuItem<int>(
-                        value: value,
-                        child: Text(value.toString()),
-                      );
-                    }).toList(),
-                    onChanged: (newValue) {
-                      if (newValue != null) {
-                        _ratePost(newValue);
-                      }
-                    },
+                  Row(
+                    children: [
+                      const Text('Rate this post:'),
+                      const SizedBox(width: 10),
+                      DropdownButton<int>(
+                        value: userRating,
+                        hint: const Text('Select Rating'),
+                        items: [1, 2, 3, 4, 5].map((int value) {
+                          return DropdownMenuItem<int>(
+                            value: value,
+                            child: Text(value.toString()),
+                          );
+                        }).toList(),
+                        onChanged: (newValue) {
+                          if (newValue != null) {
+                            _ratePost(newValue);
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        "1 being least useful, 5 being most useful",
+                        style: TextStyle(
+                          fontStyle: FontStyle.italic,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

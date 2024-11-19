@@ -1,0 +1,36 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-8.3.3, pluggy-1.5.0
+rootdir: /home/simon/repos/prompt-share-pro
+configfile: pytest.ini
+plugins: flask-1.3.0
+collected 2 items
+
+flask_tests/test_auth.py F                                               [ 50%]
+flask_tests/test_utils.py .                                              [100%]
+
+=================================== FAILURES ===================================
+_________________________________ test_signup __________________________________
+
+client = <FlaskClient <Flask 'api.create_app'>>
+mock_firestore = <MagicMock id='139414971467008'>
+
+    def test_signup(client, mock_firestore):
+        mock_firestore().collection().document().get.return_value.exists = False
+        response = client.post("/signup", json={
+            "email": "test@example.com",
+            "password": "password123",
+            "usc_id": "123456789",
+            "username": "test_user",
+            "profile_image": "http://example.com/profile.jpg"
+        })
+        print(response.json)
+>       assert response.status_code == 200
+E       assert 400 == 200
+E        +  where 400 = <WrapperTestResponse 34 bytes [400 BAD REQUEST]>.status_code
+
+flask_tests/test_auth.py:17: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{'message': 'User already exists'}
+=========================== short test summary info ============================
+FAILED flask_tests/test_auth.py::test_signup - assert 400 == 200
+========================= 1 failed, 1 passed in 0.09s ==========================

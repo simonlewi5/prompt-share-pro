@@ -1,25 +1,25 @@
 """
 Initialize the Flask application and other extensions like JWT and Firestore
 """
+
 from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
-from google.cloud import firestore
 from dotenv import load_dotenv
 from api.routes.auth import auth_bp
 from api.routes.post import post_bp
 from api.routes.comment import comment_bp
 
 load_dotenv()
-db = firestore.Client()
 
-def create_app(config_object='api.config.Config'):
+
+def create_app(config_object="api.config.Config"):
     """
     Create a Flask app using the provided configuration object
     """
     app = Flask(__name__)
     app.config.from_object(config_object)
 
-    jwt = JWTManager(app) # pylint: disable=unused-variable
+    jwt = JWTManager(app)  # pylint: disable=unused-variable
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(post_bp)

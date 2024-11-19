@@ -1,15 +1,16 @@
 """
 CRUD routes for comments
 """
+
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from google.api_core.exceptions import GoogleAPICallError, NotFound
 from api.models.comment import Comment
 
-comment_bp = Blueprint('comments', __name__)
+comment_bp = Blueprint("comments", __name__)
 
 
-@comment_bp.route('/posts/<post_id>/comments', methods=['POST'])
+@comment_bp.route("/posts/<post_id>/comments", methods=["POST"])
 @jwt_required()
 def create(post_id):
     """
@@ -17,25 +18,28 @@ def create(post_id):
     """
     data = request.get_json()
     author = get_jwt_identity()
-    content = data.get('content')
+    content = data.get("content")
 
     if not content:
-        return jsonify({'message': 'Content is required'}), 400
+        return jsonify({"message": "Content is required"}), 400
 
     try:
         comment_id = Comment.create(post_id, author, content)
-        return jsonify({
-            'message': 'Comment added successfully',
-            'comment_id': comment_id
-        }), 201
+        return (
+            jsonify(
+                {"message": "Comment added successfully", "comment_id": comment_id}
+            ),
+            201,
+        )
     except NotFound as e:
-        return jsonify({'message': str(e)}), 404
+        return jsonify({"message": str(e)}), 404
     except GoogleAPICallError as e:
-        return jsonify({'message': f"Error creating comment: {str(e)}"}), 500
+        return jsonify({"message": f"Error creating comment: {str(e)}"}), 500
     except RuntimeError as e:
-        return jsonify({'message': f"Unexpected error: {str(e)}"}), 500
+        return jsonify({"message": f"Unexpected error: {str(e)}"}), 500
 
-@comment_bp.route('/posts/<post_id>/comments', methods=['GET'])
+
+@comment_bp.route("/posts/<post_id>/comments", methods=["GET"])
 @jwt_required()
 def get_comments(post_id):
     """
@@ -45,13 +49,14 @@ def get_comments(post_id):
         comments = Comment.get_by_post(post_id)
         return jsonify(comments), 200
     except NotFound as e:
-        return jsonify({'message': str(e)}), 404
+        return jsonify({"message": str(e)}), 404
     except GoogleAPICallError as e:
-        return jsonify({'message': f"Error retrieving comments: {str(e)}"}), 500
+        return jsonify({"message": f"Error retrieving comments: {str(e)}"}), 500
     except RuntimeError as e:
-        return jsonify({'message': f"Unexpected error: {str(e)}"}), 500
+        return jsonify({"message": f"Unexpected error: {str(e)}"}), 500
 
-@comment_bp.route('/posts/<post_id>/comments/<comment_id>', methods=['DELETE'])
+
+@comment_bp.route("/posts/<post_id>/comments/<comment_id>", methods=["DELETE"])
 @jwt_required()
 def delete_comment(post_id, comment_id):
     """
@@ -59,10 +64,10 @@ def delete_comment(post_id, comment_id):
     """
     try:
         Comment.delete(post_id, comment_id)
-        return jsonify({'message': 'Comment deleted successfully'}), 200
+        return jsonify({"message": "Comment deleted successfully"}), 200
     except NotFound as e:
-        return jsonify({'message': str(e)}), 404
+        return jsonify({"message": str(e)}), 404
     except GoogleAPICallError as e:
-        return jsonify({'message': f"Error deleting comment: {str(e)}"}), 500
+        return jsonify({"message": f"Error deleting comment: {str(e)}"}), 500
     except RuntimeError as e:
-        return jsonify({'message': f"Unexpected error: {str(e)}"}), 500
+        return jsonify({"message": f"Unexpected error: {str(e)}"}), 500

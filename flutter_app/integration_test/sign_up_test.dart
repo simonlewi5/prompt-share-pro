@@ -10,7 +10,7 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('Sign Up Flow Test', () {
-    testWidgets('Login and navigate to home screen', (tester) async {
+    testWidgets('Sign up and navigate to home screen', (tester) async {
       // Initialize with an empty token to trigger the WelcomeScreen
       await tester.pumpWidget(
         ChangeNotifierProvider<UserState>(

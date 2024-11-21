@@ -98,6 +98,7 @@ class LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
+              key: const Key('submitLoginButton'),
               onPressed: login,
               child: const Text('Login'),
             ),

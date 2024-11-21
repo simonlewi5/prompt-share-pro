@@ -22,6 +22,7 @@ class WelcomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 40),
             ElevatedButton(
+              key: const Key('loginButton'),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -34,6 +35,7 @@ class WelcomeScreen extends StatelessWidget {
             ),
             SizedBox(height: 20),
             ElevatedButton(
+              key: const Key('signupButton'),
               onPressed: () {
                 Navigator.push(
                   context,

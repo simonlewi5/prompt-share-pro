@@ -71,4 +71,37 @@ def delete_comment(post_id, comment_id):
     except GoogleAPICallError as e:
         return jsonify({"message": f"Error deleting comment: {str(e)}"}), 500
     except RuntimeError as e:
+<<<<<<< HEAD
         return handle_runtime_error(e)
+=======
+
+@comment_bp.route("/posts/<post_id>/comments/<comment_id>", methods=["PUT"])
+@jwt_required()
+def update_comment(post_id, comment_id):
+    """
+    Update a comment by its ID
+    """
+    data = request.get_json()
+
+    content = data.get("content")
+
+    exception_found = None
+
+    # Update the post
+    try:
+        Comment.update(post_id, comment_id, content=content)
+    except NotFound:
+        exception_found = jsonify(message="Comment not found"), 404
+    except GoogleAPICallError as e:
+        exception_found = (
+            jsonify(message=f"Error updating comment in Firestore: {str(e)}"),
+            500,
+        )
+    except RuntimeError as e:
+        exception_found = jsonify(message=f"Unexpected error: {str(e)}"), 500
+
+    if exception_found:
+        return exception_found
+
+    return jsonify(message="Comment updated"), 200        
+>>>>>>> c6631f8 (update comment endpoint)

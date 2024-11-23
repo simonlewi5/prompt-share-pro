@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/features/post/data/gemini_repository.dart';
 import 'package:flutter_app/features/post/data/post_repository.dart';
 import 'package:flutter_app/features/post/models/post.dart';
 import 'package:flutter_app/features/post/views/comment_section.dart';
@@ -18,6 +19,7 @@ class PostDetailScreen extends StatefulWidget {
 
 class PostDetailScreenState extends State<PostDetailScreen> {
   final PostRepository postRepository = PostRepository();
+  final GeminiRepository geminiRepository = GeminiRepository();
   final logger = Logger();
   late Post post;
   bool isLoading = true;
@@ -94,6 +96,29 @@ class PostDetailScreenState extends State<PostDetailScreen> {
     }
   }
 
+  // generate gemini response
+  void _generateGeminiResponse() async {
+    final response = await geminiRepository.getGeminiResponse(post.content);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Gemini Response'),
+          content: Text(response.body),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -166,6 +191,52 @@ class PostDetailScreenState extends State<PostDetailScreen> {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(post.content),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    _generateGeminiResponse();
+                  },
+                  child: Ink(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.grey.shade500, Colors.blue.shade400],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(25.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          offset: const Offset(3, 3),
+                          blurRadius: 5,
+                          spreadRadius: 1,
+                        ),
+                      ],
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
+                      constraints: const BoxConstraints(
+                        minWidth: 150,
+                        minHeight: 50,
+                      ),
+                      alignment: Alignment.center,
+                      child: const Text(
+                        'Test Prompt on Gemini!',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 10),
             if (post.authorNotes.isNotEmpty)

@@ -87,6 +87,7 @@ class ProfileScreenState extends State<ProfileScreen> {
         title: const Text('Profile'),
         actions: [
           PopupMenuButton<String>(
+            key: const Key('popupMenuButton'),
             onSelected: (String value) {
               if (value == 'Edit Profile') {
                 Navigator.push(

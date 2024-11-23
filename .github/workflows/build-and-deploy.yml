@@ -10,6 +10,7 @@ jobs:
       id-token: write
       contents: read
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v2
 
@@ -43,7 +44,6 @@ jobs:
           source: "./api/*"
           target: "/opt/flask-app"
           overwrite: true
-          # strip_components: 1
 
       - name: "Install Python dependencies on server"
         uses: appleboy/ssh-action@master
@@ -58,21 +58,21 @@ jobs:
             pip install --upgrade pip
             pip install -r api/requirements.txt
 
-      - name: "Set GOOGLE_APPLICATION_CREDENTIALS"
+      - name: "Set up environment variables"
         run: |
           echo "${{ secrets.GCP_CREDENTIALS_BASE64 }}" | base64 --decode > /tmp/gcp-credentials.json
-          export GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcp-credentials.json
-
-      - name: "Set JWT_SECRET_KEY"
-        run: |
+          echo "GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcp-credentials.json" >> /tmp/.env
           echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> /tmp/.env
-          export JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
-
-      - name: "Set GCP_API_KEY"
-        run: |
           echo "GCP_API_KEY=${{ secrets.GCP_API_KEY }}" >> /tmp/.env
-            export GCP_API_KEY=${{ secrets.GCP_API_KEY }}
-        
+
+      - name: "Copy .env file to server"
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.API_SERVER_IP }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "/tmp/.env"
+          target: "/opt/flask-app/.env"
 
       - name: "Kill existing Flask process"
         uses: appleboy/ssh-action@master
@@ -93,6 +93,7 @@ jobs:
             cd /opt/flask-app
             source venv/bin/activate
             export PYTHONPATH=/opt/flask-app
+            source .env
             nohup gunicorn --workers 3 --bind 0.0.0.0:8000 api.wsgi:app \
             --log-level=debug --access-logfile /var/log/flask-app/access.log \
             --log-file /var/log/flask-app/flask.log > /var/log/flask-app/flask.log 2>&1 &

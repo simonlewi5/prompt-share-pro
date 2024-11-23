@@ -45,6 +45,8 @@ class CreatePostScreenState extends State<CreatePostScreen> {
       snackBarMessage(context, text);
       logger.i(text);
 
+      FocusManager.instance.primaryFocus?.unfocus();
+
       if (mounted) {
         Navigator.popUntil(context, (route) => route.isFirst);
       }
@@ -140,6 +142,7 @@ class CreatePostScreenState extends State<CreatePostScreen> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
+              key: const Key('createPostSubmitButton'),
               onPressed: createPost,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.grey[350],

@@ -52,6 +52,8 @@ class ProfileScreenState extends State<ProfileScreen> {
     userState.clearUserData();
     logger.i("User signed out successfully");
 
+    FocusManager.instance.primaryFocus?.unfocus();
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -167,6 +169,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                       subtitle: Text(userState.email),
                     ),
                     ElevatedButton(
+                      key: const Key('viewPostsButton'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.grey[350],
                         foregroundColor: Colors.lightBlue,

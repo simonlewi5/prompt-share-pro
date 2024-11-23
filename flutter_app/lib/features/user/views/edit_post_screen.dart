@@ -157,6 +157,7 @@ class EditPostScreenState extends State<EditPostScreen> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
+              key: const Key('EditPostSubmitButton'),
               onPressed: () async {
                 final updatedPost = Post(
                   id: post.id,
@@ -169,6 +170,8 @@ class EditPostScreenState extends State<EditPostScreen> {
                   totalRatings: post.totalRatings,
                   averageRating: post.averageRating,
                 );
+
+                FocusManager.instance.primaryFocus?.unfocus();
 
                 try {
                   final response = await postRepository.updatePost(post.id!, updatedPost);

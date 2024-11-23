@@ -86,6 +86,7 @@ class PostListScreenState extends State<PostListScreen> {
           title: const Text('Posts'),
           actions: [
             IconButton(
+              key: const Key('createPostScreenButton'),
               icon: const Icon(Icons.add),
               onPressed: () {
                 Navigator.push(

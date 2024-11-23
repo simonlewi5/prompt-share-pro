@@ -1,8 +1,12 @@
 name: Build and Deploy Flask App
 
 on:
-  push:
-  workflow_dispatch:
+  workflow_run:
+    workflows: 
+      - Lint
+      - Tests
+    types:
+      - completed
 
 jobs:
   build-and-deploy:

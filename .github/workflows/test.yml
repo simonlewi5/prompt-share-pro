@@ -1,0 +1,32 @@
+name: Tests
+
+on:
+  push:
+    paths:
+      - "flask_tests/**"
+      - "api/**"
+  pull_request:
+    paths:
+      - "flask_tests/**"
+      - "api/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install -r api/requirements.txt
+          pip install pytest
+
+      - name: Run tests
+        run: |
+          pytest flask_tests/

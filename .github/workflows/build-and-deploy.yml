@@ -71,7 +71,7 @@ jobs:
       - name: "Set GCP_API_KEY"
         run: |
           echo "GCP_API_KEY=${{ secrets.GCP_API_KEY }}" >> /tmp/.env
-          export GCP_API_KEY=${{ secrets.GCP_API_KEY }}
+            export GCP_API_KEY=${{ secrets.GCP_API_KEY }}
         
 
       - name: "Kill existing Flask process"
@@ -94,9 +94,8 @@ jobs:
             source venv/bin/activate
             export PYTHONPATH=/opt/flask-app
             nohup gunicorn --workers 3 --bind 0.0.0.0:8000 api.wsgi:app \
-            --log-level=info --access-logfile /var/log/flask-app/access.log \
-            --log-file /var/log/flask-app/flask.log > /var/log/flask_run.log &
-
+            --log-level=debug --access-logfile /var/log/flask-app/access.log \
+            --log-file /var/log/flask-app/flask.log > /var/log/flask-app/flask.log 2>&1 &
 
       - name: "Restart Nginx"
         uses: appleboy/ssh-action@master

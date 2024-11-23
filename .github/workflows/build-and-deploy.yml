@@ -95,7 +95,8 @@ jobs:
             export PYTHONPATH=/opt/flask-app
             nohup gunicorn --workers 3 --bind 0.0.0.0:8000 api.wsgi:app \
             --log-level=info --access-logfile /var/log/flask-app/access.log \
-            --log-file /var/log/flask-app/flask.log > /var/log/flask-app/flask.log 2>&1 &
+            --log-file /var/log/flask-app/flask.log > /var/log/flask_run.log 2>&1 &
+
 
       - name: "Restart Nginx"
         uses: appleboy/ssh-action@master

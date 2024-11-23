@@ -3,14 +3,14 @@ Gemini API routes
 """
 
 from flask import Blueprint, request, jsonify
-# from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required
 from google.api_core.exceptions import GoogleAPICallError
 from api.models.gemini import Gemini
 
 gemini_bp = Blueprint("gemini", __name__)
 
 
-# @jwt_required()
+@jwt_required()
 @gemini_bp.route("/gemini/generate", methods=["POST"])
 def generate_content():
     """

@@ -2,9 +2,10 @@
 Gemini model
 """
 
+import os
+import logging
 from google.api_core.exceptions import GoogleAPICallError
 import google.generativeai as genai
-from api.config import config
 
 
 class Gemini:
@@ -17,9 +18,19 @@ class Gemini:
         """
         Configure the Gemini API client
         """
-        if not config.GCP_API_KEY:
+        logging.debug("Starting Gemini API client configuration.")
+        if not os.environ.get("GCP_API_KEY"):
+            logging.error("GCP_API_KEY is not set. Cannot configure Gemini API.")
             raise RuntimeError("GCP_API_KEY is not set. Cannot configure Gemini API.")
-        genai.configure(api_key=config.GCP_API_KEY)
+
+        try:
+            genai.configure(api_key=os.environ.get("GCP_API_KEY"))
+            logging.info("Gemini API client configured successfully.")
+        except Exception as e:
+            logging.error("Error configuring Gemini API client: %s", str(e))
+            raise RuntimeError(
+                f"Failed to configure Gemini API client: {str(e)}"
+            ) from e
 
     @staticmethod
     def generate_prompt(prompt, model="gemini-1.5-flash"):

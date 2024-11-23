@@ -17,10 +17,9 @@ class Gemini:
         """
         Configure the Gemini API client
         """
-        try:
-            genai.configure()
-        except Exception as e:
-            raise RuntimeError(f"Failed to configure Gemini API client: {str(e)}") from e
+        if not config.GCP_API_KEY:
+            raise RuntimeError("GCP_API_KEY is not set. Cannot configure Gemini API.")
+        genai.configure(api_key=config.GCP_API_KEY)
 
     @staticmethod
     def generate_prompt(prompt, model="gemini-1.5-flash"):

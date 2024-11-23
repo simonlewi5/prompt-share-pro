@@ -109,11 +109,14 @@ class PostListScreenState extends State<PostListScreen> {
                 builder: (context, controller) {
                   return SearchBar(
                     controller: _searchController,
-                    padding: const WidgetStatePropertyAll<EdgeInsets>(
-                        EdgeInsets.symmetric(horizontal: 10.0, vertical: 2.0)),
+                    padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                      const EdgeInsets.symmetric(horizontal: 10.0, vertical: 2.0),
+                    ),
                     leading: const Icon(Icons.search),
+                    hintText: 'Search by $selectedFilter...',
                     trailing: <Widget>[
                       PopupMenuButton<String>(
+                        key: const Key('popupMenuButton'),
                         icon: const Icon(Icons.more_vert),
                         onSelected: (value) {
                           setState(() {
@@ -138,8 +141,9 @@ class PostListScreenState extends State<PostListScreen> {
                         },
                       ),
                     ],
-                    onTap: () => _searchController.openView(),
-                    onChanged: (_) => _searchController.openView(),
+                    onChanged: (_) {
+                      _onSearchChanged();
+                    },
                   );
                 },
                 suggestionsBuilder: (context, controller) {

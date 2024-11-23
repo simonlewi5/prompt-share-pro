@@ -17,7 +17,7 @@ auth_bp = Blueprint("auth", __name__)
 @auth_bp.route("/signup", methods=["POST"])
 def signup():
     """
-    Create a new user
+    Create a new user. Requires USC ID, email, and password.
     """
     data = request.get_json()
 

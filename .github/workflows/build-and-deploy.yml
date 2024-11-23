@@ -68,6 +68,12 @@ jobs:
           echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> /tmp/.env
           export JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
 
+      - name: "Set GCP_API_KEY"
+        run: |
+          echo "GCP_API_KEY=${{ secrets.GCP_API_KEY }}" >> /tmp/.env
+          export GCP_API_KEY=${{ secrets.GCP_API_KEY }}
+        
+
       - name: "Kill existing Flask process"
         uses: appleboy/ssh-action@master
         with:

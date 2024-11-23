@@ -21,6 +21,7 @@ class Config:
         return "Config()"
 
     JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "secret-key")
+    GCP_API_KEY = os.environ.get("GCP_API_KEY")
 
 
 config = Config()

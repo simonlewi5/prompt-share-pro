@@ -155,7 +155,7 @@ class Post:
             if user_email in user_ratings:
                 raise Exception( # pylint: disable=broad-exception-raised
                     "User has already rated this post."
-                )  
+                )
 
             user_ratings[user_email] = rating
             total_points = post_data.get("total_points", 0) + rating

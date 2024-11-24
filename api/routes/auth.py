@@ -10,6 +10,7 @@ from google.api_core.exceptions import GoogleAPICallError, NotFound, AlreadyExis
 from flask_jwt_extended import create_access_token
 from api.models.user import User
 from api.utils.validators import is_valid_usc_email, is_valid_usc_id
+from api.utils.error_handler import handle_runtime_error
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -61,7 +62,7 @@ def signup():
             500,
         )
     except RuntimeError as e:
-        exception_found = jsonify(message=f"Unexpected error: {str(e)}"), 500
+        return handle_runtime_error(e)
 
     if exception_found:
         return exception_found
@@ -99,7 +100,7 @@ def login():
     except GoogleAPICallError as e:
         exception_found = jsonify(message=f"Error accessing Firestore: {str(e)}"), 500
     except RuntimeError as e:
-        exception_found = jsonify(message=f"Unexpected error: {str(e)}"), 500
+        return handle_runtime_error(e)
 
     if exception_found:
         return exception_found
@@ -129,7 +130,7 @@ def get_user(email):
     except GoogleAPICallError as e:
         return jsonify({"message": f"Error retrieving user: {str(e)}"}), 500
     except RuntimeError as e:
-        return jsonify({"message": f"Unexpected error: {str(e)}"}), 500
+        return handle_runtime_error(e)
 
 
 # Update user by email
@@ -159,7 +160,7 @@ def update_user(email):
             500,
         )
     except RuntimeError as e:
-        exception_found = jsonify(message=f"Unexpected error: {str(e)}"), 500
+        return handle_runtime_error(e)
 
     if exception_found:
         return exception_found

@@ -5,19 +5,13 @@ Post model
 from datetime import datetime, timezone
 from google.cloud import firestore
 from google.api_core.exceptions import GoogleAPICallError, NotFound
+from api.utils.firestore_helpers import get_document_or_raise
 
 
 class Post:
     """
     Post model
     """
-
-    @staticmethod
-    def get_db():
-        """
-        Get Firestore client
-        """
-        return firestore.Client()
 
     @staticmethod
     def create(author, title, llm_kind, content, author_notes):
@@ -27,8 +21,8 @@ class Post:
             GoogleAPICallError: if Firestore error occurs
             Exception: if unexpected error occurs
         """
-        db = Post.get_db()
         try:
+            db = firestore.Client()
             post_ref = db.collection("posts").document()
             post_data = {
                 "author": author,
@@ -59,14 +53,11 @@ class Post:
             GoogleAPICallError: if Firestore error occurs
             Exception: if unexpected error occurs
         """
-        db = Post.get_db()
         try:
-            post_ref = db.collection("posts").document(post_id).get()
-            if not post_ref.exists:
-                raise NotFound(f"Post with ID {post_id} not found.")
-            post = post_ref.to_dict()
-            post["id"] = post_ref.id  # Attach the Firestore document ID
-            return post
+            post = get_document_or_raise("posts", post_id)
+            post_data = post.to_dict()
+            post_data["id"] = post.id  # Attach the Firestore document ID
+            return post_data
         except NotFound as e:
             raise NotFound(str(e)) from e
         except GoogleAPICallError as e:
@@ -85,9 +76,8 @@ class Post:
             GoogleAPICallError: if Firestore error occurs
             Exception: if unexpected error occurs
         """
-        db = Post.get_db()
         try:
-            post_ref = db.collection("posts").document(post_id)
+            post = get_document_or_raise("posts", post_id)
             updates = {}
             if title:
                 updates["title"] = title
@@ -98,8 +88,8 @@ class Post:
             if author_notes:
                 updates["author_notes"] = author_notes
             if updates:
-                updates["updated_at"] = datetime.utcnow()
-                post_ref.update(updates)
+                updates["updated_at"] = datetime.now(timezone.utc)
+                post.reference.update(updates)
             return True
         except NotFound as e:
             raise NotFound(f"Post with ID {post_id} not found.") from e
@@ -119,10 +109,9 @@ class Post:
             GoogleAPICallError: if Firestore error occurs
             Exception: if unexpected error occurs
         """
-        db = Post.get_db()
         try:
-            post_ref = db.collection("posts").document(post_id)
-            post_ref.delete()
+            post = get_document_or_raise("posts", post_id)
+            post.reference.delete()
             return True
         except NotFound as e:
             raise NotFound(f"Post with ID {post_id} not found.") from e
@@ -142,18 +131,13 @@ class Post:
             GoogleAPICallError: if Firestore error occurs
             Exception: if unexpected error occurs
         """
-        db = Post.get_db()
         try:
-            post_ref = db.collection("posts").document(post_id)
-            post = post_ref.get()
-            if not post.exists:
-                raise NotFound(f"Post with ID {post_id} not found.")
-
+            post = get_document_or_raise("posts", post_id)
             post_data = post.to_dict()
             user_ratings = post_data.get("user_ratings", {})
 
             if user_email in user_ratings:
-                raise Exception( # pylint: disable=broad-exception-raised
+                raise Exception(  # pylint: disable=broad-exception-raised
                     "User has already rated this post."
                 )
 
@@ -161,7 +145,7 @@ class Post:
             total_points = post_data.get("total_points", 0) + rating
             total_ratings = post_data.get("total_ratings", 0) + 1
 
-            post_ref.update(
+            post.reference.update(
                 {
                     "user_ratings": user_ratings,
                     "total_points": total_points,

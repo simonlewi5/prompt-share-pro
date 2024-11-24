@@ -3,21 +3,14 @@ Comment model
 """
 
 from datetime import datetime, timezone
-from google.cloud import firestore
 from google.api_core.exceptions import GoogleAPICallError, NotFound
+from api.utils.firestore_helpers import get_document_or_raise
 
 
 class Comment:
     """
     Comment model
     """
-
-    @staticmethod
-    def get_db():
-        """
-        Get Firestore client
-        """
-        return firestore.Client()
 
     @staticmethod
     def create(post_id, author, content):
@@ -27,14 +20,9 @@ class Comment:
             GoogleAPICallError: if Firestore error occurs
             Exception: if unexpected error occurs
         """
-        db = Comment.get_db()
         try:
-            post_ref = db.collection("posts").document(post_id)
-            post = post_ref.get()
-            if not post.exists:
-                raise NotFound(f"Post with ID {post_id} not found.")
-
-            comment_ref = post_ref.collection("comments").document()
+            post = get_document_or_raise("posts", post_id)
+            comment_ref = post.reference.collection("comments").document()
             comment_data = {
                 "author": author,
                 "content": content,
@@ -62,14 +50,9 @@ class Comment:
             GoogleAPICallError: if Firestore error occurs
             Exception: if unexpected error occurs
         """
-        db = Comment.get_db()
         try:
-            post_ref = db.collection("posts").document(post_id)
-            post = post_ref.get()
-            if not post.exists:
-                raise NotFound(f"Post with ID {post_id} not found.")
-
-            comments_ref = post_ref.collection("comments").stream()
+            post = get_document_or_raise("posts", post_id)
+            comments_ref = post.reference.collection("comments").stream()
             comments = []
             for comment in comments_ref:
                 comment_data = comment.to_dict()
@@ -94,10 +77,9 @@ class Comment:
             GoogleAPICallError: if Firestore error occurs
             Exception: if unexpected error occurs
         """
-        db = Comment.get_db()
         try:
-            post_ref = db.collection("posts").document(post_id)
-            comment_ref = post_ref.collection("comments").document(comment_id)
+            post = get_document_or_raise("posts", post_id)
+            comment_ref = post.reference.collection("comments").document(comment_id)
             comment = comment_ref.get()
             if not comment.exists:
                 raise NotFound(f"Comment with ID {comment_id} not found.")

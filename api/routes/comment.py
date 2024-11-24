@@ -6,6 +6,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from google.api_core.exceptions import GoogleAPICallError, NotFound
 from api.models.comment import Comment
+from api.utils.error_handler import handle_runtime_error
 
 comment_bp = Blueprint("comments", __name__)
 
@@ -36,7 +37,7 @@ def create(post_id):
     except GoogleAPICallError as e:
         return jsonify({"message": f"Error creating comment: {str(e)}"}), 500
     except RuntimeError as e:
-        return jsonify({"message": f"Unexpected error: {str(e)}"}), 500
+        return handle_runtime_error(e)
 
 
 @comment_bp.route("/posts/<post_id>/comments", methods=["GET"])
@@ -53,7 +54,7 @@ def get_comments(post_id):
     except GoogleAPICallError as e:
         return jsonify({"message": f"Error retrieving comments: {str(e)}"}), 500
     except RuntimeError as e:
-        return jsonify({"message": f"Unexpected error: {str(e)}"}), 500
+        return handle_runtime_error(e)
 
 
 @comment_bp.route("/posts/<post_id>/comments/<comment_id>", methods=["DELETE"])
@@ -70,4 +71,4 @@ def delete_comment(post_id, comment_id):
     except GoogleAPICallError as e:
         return jsonify({"message": f"Error deleting comment: {str(e)}"}), 500
     except RuntimeError as e:
-        return jsonify({"message": f"Unexpected error: {str(e)}"}), 500
+        return handle_runtime_error(e)

@@ -8,6 +8,7 @@ from google.api_core.exceptions import GoogleAPICallError, NotFound
 from google.cloud import firestore
 from api.models.post import Post
 from api.utils.validators import validate_post_data
+from api.utils.error_handler import handle_runtime_error
 
 post_bp = Blueprint("post", __name__)
 
@@ -43,7 +44,7 @@ def create_post():
     except GoogleAPICallError as e:
         return jsonify(message=f"Error creating post in Firestore: {str(e)}"), 500
     except RuntimeError as e:
-        return jsonify(message=f"Unexpected error: {str(e)}"), 500
+        return handle_runtime_error(e)
 
     return jsonify(message="Post created", post_id=post_id), 201
 
@@ -67,7 +68,7 @@ def get_all_posts():
     except GoogleAPICallError as e:
         return jsonify(message=f"Error accessing Firestore: {str(e)}"), 500
     except RuntimeError as e:
-        return jsonify(message=f"Unexpected error: {str(e)}"), 500
+        return handle_runtime_error(e)
 
 
 # Get all posts by a specific user
@@ -92,7 +93,7 @@ def get_post_by_user(user_email):
     except GoogleAPICallError as e:
         return jsonify(message=f"Error accessing Firestore: {str(e)}"), 500
     except RuntimeError as e:
-        return jsonify(message=f"Unexpected error: {str(e)}"), 500
+        return handle_runtime_error(e)
 
 
 # Get a post by its ID
@@ -110,7 +111,7 @@ def get_post(post_id):
     except GoogleAPICallError as e:
         return jsonify(message=f"Error accessing Firestore: {str(e)}"), 500
     except RuntimeError as e:
-        return jsonify(message=f"Unexpected error: {str(e)}"), 500
+        return handle_runtime_error(e)
 
     return jsonify(post), 200
 
@@ -146,7 +147,7 @@ def update_post(post_id):
             500,
         )
     except RuntimeError as e:
-        exception_found = jsonify(message=f"Unexpected error: {str(e)}"), 500
+        return handle_runtime_error(e)
 
     if exception_found:
         return exception_found
@@ -173,7 +174,7 @@ def delete_post(post_id):
             500,
         )
     except RuntimeError as e:
-        exception_found = jsonify(message=f"Unexpected error: {str(e)}"), 500
+        return handle_runtime_error(e)
 
     if exception_found:
         return exception_found
@@ -203,7 +204,7 @@ def rate_post(post_id):
     except GoogleAPICallError as e:
         return jsonify(message=f"Error accessing Firestore: {str(e)}"), 500
     except RuntimeError as e:
-        return jsonify(message=f"Unexpected error: {str(e)}"), 500
+        return handle_runtime_error(e)
 
 
 @post_bp.route("/posts/<post_id>/has_rated", methods=["GET"])
@@ -226,4 +227,4 @@ def has_rated(post_id):
     except GoogleAPICallError as e:
         return jsonify(message=f"Error accessing Firestore: {str(e)}"), 500
     except RuntimeError as e:
-        return jsonify(message=f"Unexpected error: {str(e)}"), 500
+        return handle_runtime_error(e)

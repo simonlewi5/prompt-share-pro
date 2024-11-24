@@ -6,6 +6,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
 from google.api_core.exceptions import GoogleAPICallError
 from api.models.gemini import Gemini
+from api.utils.error_handler import handle_runtime_error
 
 gemini_bp = Blueprint("gemini", __name__)
 
@@ -29,4 +30,4 @@ def generate_content():
     except GoogleAPICallError as e:
         return jsonify(message=f"Error interacting with Gemini API: {str(e)}"), 500
     except RuntimeError as e:
-        return jsonify(message=f"Unexpected error: {str(e)}"), 500
+        return handle_runtime_error(e)

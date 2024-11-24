@@ -1,7 +1,7 @@
 """
 Tests for the Post API endpoints
 """
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 
 def test_create_post(client, auth_headers):

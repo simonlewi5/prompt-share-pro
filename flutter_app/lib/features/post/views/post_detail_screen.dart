@@ -5,6 +5,7 @@ import 'package:flutter_app/features/post/models/post.dart';
 import 'package:flutter_app/features/post/views/comment_section.dart';
 import 'dart:convert';
 import 'package:logger/logger.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 var logger = Logger();
 
@@ -98,22 +99,75 @@ class PostDetailScreenState extends State<PostDetailScreen> {
 
   // generate gemini response
   void _generateGeminiResponse() async {
-    final response = await geminiRepository.getGeminiResponse(post.content);
-
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text('Gemini Response'),
-          content: Text(response.body),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Close'),
-            ),
-          ],
+        bool isLoading = true;
+        String markdownContent = '';
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            if (isLoading) {
+              // Fetch Gemini response asynchronously
+              geminiRepository.getGeminiResponse(post.content).then((response) {
+                try {
+                  final Map<String, dynamic> responseData = jsonDecode(response.body);
+                  markdownContent = responseData['generated_content']
+                      ?.replaceAll(r'\n\n', '\n') ??
+                      'No content available.';
+                } catch (e) {
+                  markdownContent = 'Error processing response.';
+                  logger.e('Error decoding Gemini response: $e');
+                }
+
+                setState(() {
+                  isLoading = false;
+                });
+              }).catchError((e) {
+                setState(() {
+                  isLoading = false;
+                  markdownContent = 'Error fetching response: $e';
+                });
+                logger.e('Error generating Gemini response: $e');
+              });
+
+              // Show spinner while loading
+              return AlertDialog(
+                title: const Text('Gemini Response'),
+                content: const SizedBox(
+                  height: 400,
+                  width: 300,
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+              );
+            }
+
+            // Show content after loading completes
+            return AlertDialog(
+              title: const Text('Gemini Response'),
+              content: SizedBox(
+                height: 400,
+                width: 300,
+                child: Markdown(
+                  data: markdownContent,
+                  styleSheet: MarkdownStyleSheet(
+                    h1: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    p: const TextStyle(fontSize: 16),
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Close'),
+                ),
+              ],
+            );
+          },
         );
       },
     );

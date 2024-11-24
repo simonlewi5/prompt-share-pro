@@ -32,6 +32,7 @@ dependencies:
     sdk: flutter
   flutter_slidable: ^3.1.1
   lottie: ^2.2.0
+  flutter_markdown:
 
 
   # The following adds the Cupertino Icons font to your application.

@@ -22,7 +22,10 @@ class GeminiRepository {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
       },
-      body: jsonEncode(prompt),
+      body: jsonEncode({
+        'prompt': prompt,
+        'model': 'gemini-1.5-flash',
+      }),
     );
 
     if (response.statusCode == 200) {
@@ -31,5 +34,4 @@ class GeminiRepository {
       logger.i(response.body);
       throw Exception('Failed to load gemini response');
     }
-  }
-}
+  }}

@@ -165,6 +165,14 @@ class CommentSectionState extends State<CommentSection> {
                     label: 'Edit',
                     backgroundColor: Colors.blueAccent,
                   ),
+                  SlidableAction(
+                    onPressed: (context) {
+                      _showDeleteDialog(comment.id!);
+                    },
+                    icon: Icons.delete,
+                    label: 'Delete',
+                    backgroundColor: Colors.redAccent,
+                  ),
                 ],
               ),
               child: Container(
@@ -236,10 +244,51 @@ class CommentSectionState extends State<CommentSection> {
     );
   }
 
+  void _showDeleteDialog(String commentId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Comment'),
+          content: const Text('Are you sure you want to delete this comment?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                _deleteComment(commentId);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deleteComment(String commentId) async {
+    try {
+      final response = await commentRepository.deleteComment(widget.postId, commentId);
+      if (response.statusCode == 200) {
+        _fetchComments();
+      } else {
+        logger.i('Failed to delete comment');
+      }
+    } catch (e) {
+      logger.i('Failed to delete comment: $e');
+    }
+  }
+
+
   void _updateComment(String commentId, String newComment) async {
     try {
       final response = await commentRepository.updateComment(widget.postId, commentId, newComment);
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200) {
         contentController.clear();
         _fetchComments();
       } else {

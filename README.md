@@ -50,3 +50,9 @@ When working on the front end, **open only the `flutter_app` directory** in Andr
 - You may need to download all packages and dependencies so to be safe run `flutter pub get` before running app.
 
 Now you're ready to start working with the app!
+
+## New Features Added in 2.5
+
+- Gemini integration
+- Lint and test integrations in CI/CD pipelines
+- User can update and delete their own comments

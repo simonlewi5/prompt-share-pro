@@ -75,4 +75,3 @@ class Comment:
             raise NotFound(f"Comment with ID {comment_id} not found.")
         comment_ref.update({"content": content})
         return comment_ref.id
-    

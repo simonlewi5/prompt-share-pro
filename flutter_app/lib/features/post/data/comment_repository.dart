@@ -54,4 +54,18 @@ class CommentRepository {
     );
     return response;
   }
+
+  Future<http.Response> updateComment(String postId, String commentId, String content) async {
+    logger.i(commentId);
+    String? token = await _getToken();
+    final response = await http.put(
+      Uri.parse('$baseUrl/posts/$postId/comments/$commentId'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({'content': content}),
+    );
+    return response;
+  }
 }

@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:flutter_app/features/post/data/comment_repository.dart';
 import 'package:flutter_app/features/post/models/comment.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:provider/provider.dart';
+import '../../../core/services/user_state.dart';
+import '../../user/data/user_repository.dart';
+import '../../user/models/user.dart';
 
 var logger = Logger();
 
@@ -19,6 +24,11 @@ class CommentSectionState extends State<CommentSection> {
   final TextEditingController contentController = TextEditingController();
   List<Comment> comments = [];
   bool isLoading = true;
+
+  final UserRepository userRepository = UserRepository();
+  User? user;
+
+  late Map<String, String> currentUser;
 
   @override
   void initState() {
@@ -106,6 +116,11 @@ class CommentSectionState extends State<CommentSection> {
 
   @override
   Widget build(BuildContext context) {
+    final userState = Provider.of<UserState>(context);
+    currentUser = {
+      'username': userState.username,
+      'email': userState.email,
+    };
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -135,25 +150,103 @@ class CommentSectionState extends State<CommentSection> {
           itemCount: comments.length,
           itemBuilder: (context, index) {
             final comment = comments[index];
-            return Container(
-              margin: const EdgeInsets.symmetric(vertical: 8.0),
-              padding: const EdgeInsets.all(5.0),
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(8.0),
-                border: Border.all(color: Colors.grey, width: 1),
+            final isUserComment = comment.author['username'] == currentUser['username'] &&
+                comment.author['email'] == currentUser['email'];
+            return Slidable(
+              enabled: isUserComment,
+              endActionPane: ActionPane(
+                motion: const ScrollMotion(),
+                children: [
+                  SlidableAction(
+                    onPressed: (context) {
+                      _showEditDialog(comment.id!, comment.content);
+                    },
+                    icon: Icons.edit,
+                    label: 'Edit',
+                    backgroundColor: Colors.blueAccent,
+                  ),
+                ],
               ),
-              child: ListTile(
-                title: Text(
-                  '${comment.author['username']} (${comment.author['email']})',
-                  style: const TextStyle(fontSize: 15),
+              child: Container(
+                margin: const EdgeInsets.symmetric(vertical: 8.0),
+                padding: const EdgeInsets.all(5.0),
+                decoration: BoxDecoration(
+                  color: isUserComment ? Colors.grey[300] : Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8.0),
+                  border: Border.all(color: Colors.grey, width: 1),
                 ),
-                subtitle: Text(comment.content),
+                child: ListTile(
+                  title: Text(
+                    '${comment.author['username']} (${comment.author['email']})',
+                    style: const TextStyle(fontSize: 15),
+                  ),
+                  subtitle: Text(comment.content),
+                ),
               ),
             );
           },
         ),
       ],
     );
+  }
+
+  void _showEditDialog(String commentId, String currentContent) {
+    logger.i(commentId);
+    final TextEditingController editController =
+    TextEditingController(text: currentContent);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit Comment'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: editController,
+                decoration: const InputDecoration(
+                  labelText: 'Update your comment...',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: null,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                final newContent = editController.text.trim();
+                if (newContent.isNotEmpty && newContent != currentContent) {
+                  _updateComment(commentId, newContent);
+                }
+                Navigator.of(context).pop();
+              },
+              child: const Text('Update'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _updateComment(String commentId, String newComment) async {
+    try {
+      final response = await commentRepository.updateComment(widget.postId, commentId, newComment);
+      if (response.statusCode == 201) {
+        contentController.clear();
+        _fetchComments();
+      } else {
+        logger.i('Failed to update comment');
+      }
+    } catch (e) {
+      logger.i('Failed to update comment: $e');
+    }
   }
 }

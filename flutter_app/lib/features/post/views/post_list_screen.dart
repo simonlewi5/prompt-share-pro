@@ -108,6 +108,7 @@ class PostListScreenState extends State<PostListScreen> {
               SearchAnchor(
                 builder: (context, controller) {
                   return SearchBar(
+                    key: const Key('searchBar'),
                     controller: _searchController,
                     padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
                       const EdgeInsets.symmetric(horizontal: 10.0, vertical: 2.0),
@@ -179,6 +180,7 @@ class PostListScreenState extends State<PostListScreen> {
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                       child: ListTile(
+                        key: Key(post.title),
                         contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
                         title: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -3,8 +3,9 @@ Comment model
 """
 
 from datetime import datetime, timezone
-from google.api_core.exceptions import GoogleAPICallError, NotFound
-from api.utils.firestore_helpers import get_document_or_raise
+from google.api_core.exceptions import NotFound
+from api.utils.firestore_helpers import get_document_or_raise, fetch_collection_items
+from api.utils.error_handler import handle_firestore_exceptions
 
 
 class Comment:
@@ -13,6 +14,7 @@ class Comment:
     """
 
     @staticmethod
+    @handle_firestore_exceptions
     def create(post_id, author, content):
         """
         Create a new comment on a post
@@ -20,28 +22,18 @@ class Comment:
             GoogleAPICallError: if Firestore error occurs
             Exception: if unexpected error occurs
         """
-        try:
-            post = get_document_or_raise("posts", post_id)
-            comment_ref = post.reference.collection("comments").document()
-            comment_data = {
-                "author": author,
-                "content": content,
-                "created_at": datetime.now(timezone.utc),
-            }
-            print(f"Creating comment at path: {comment_ref.path}")
-            print(f"Comment data: {comment_data}")
-            comment_ref.set(comment_data)
-            return comment_ref.id
-        except NotFound as e:
-            raise NotFound(str(e)) from e
-        except GoogleAPICallError as e:
-            raise GoogleAPICallError(
-                f"Firestore error while creating comment: {str(e)}"
-            ) from e
-        except Exception as e:
-            raise RuntimeError(f"Unexpected error: {str(e)}") from e
+        post = get_document_or_raise("posts", post_id)
+        comment_ref = post.reference.collection("comments").document()
+        comment_data = {
+            "author": author,
+            "content": content,
+            "created_at": datetime.now(timezone.utc),
+        }
+        comment_ref.set(comment_data)
+        return comment_ref.id
 
     @staticmethod
+    @handle_firestore_exceptions
     def get_by_post(post_id):
         """
         Get all comments for a specific post
@@ -50,25 +42,11 @@ class Comment:
             GoogleAPICallError: if Firestore error occurs
             Exception: if unexpected error occurs
         """
-        try:
-            post = get_document_or_raise("posts", post_id)
-            comments_ref = post.reference.collection("comments").stream()
-            comments = []
-            for comment in comments_ref:
-                comment_data = comment.to_dict()
-                comment_data["id"] = comment.id
-                comments.append(comment_data)
-            return comments
-        except NotFound as e:
-            raise NotFound(str(e)) from e
-        except GoogleAPICallError as e:
-            raise GoogleAPICallError(
-                f"Firestore error while retrieving comments: {str(e)}"
-            ) from e
-        except Exception as e:
-            raise RuntimeError(f"Unexpected error: {str(e)}") from e
+        post = get_document_or_raise("posts", post_id)
+        return fetch_collection_items(post, "comments")
 
     @staticmethod
+    @handle_firestore_exceptions
     def delete(post_id, comment_id):
         """
         Delete a comment by its ID on a specific post
@@ -77,19 +55,9 @@ class Comment:
             GoogleAPICallError: if Firestore error occurs
             Exception: if unexpected error occurs
         """
-        try:
-            post = get_document_or_raise("posts", post_id)
-            comment_ref = post.reference.collection("comments").document(comment_id)
-            comment = comment_ref.get()
-            if not comment.exists:
-                raise NotFound(f"Comment with ID {comment_id} not found.")
-
-            comment_ref.delete()
-        except NotFound as e:
-            raise NotFound(str(e)) from e
-        except GoogleAPICallError as e:
-            raise GoogleAPICallError(
-                f"Firestore error while deleting comment: {str(e)}"
-            ) from e
-        except Exception as e:
-            raise RuntimeError(f"Unexpected error: {str(e)}") from e
+        post = get_document_or_raise("posts", post_id)
+        comment_ref = post.reference.collection("comments").document(comment_id)
+        comment = comment_ref.get()
+        if not comment.exists:
+            raise NotFound(f"Comment with ID {comment_id} not found.")
+        comment_ref.delete()

@@ -4,8 +4,8 @@ Gemini model
 
 import os
 import logging
-from google.api_core.exceptions import GoogleAPICallError
 import google.generativeai as genai
+from api.utils.error_handler import handle_firestore_exceptions
 
 
 class Gemini:
@@ -22,17 +22,10 @@ class Gemini:
         if not os.environ.get("GCP_API_KEY"):
             logging.error("GCP_API_KEY is not set. Cannot configure Gemini API.")
             raise RuntimeError("GCP_API_KEY is not set. Cannot configure Gemini API.")
-
-        try:
-            genai.configure(api_key=os.environ.get("GCP_API_KEY"))
-            logging.info("Gemini API client configured successfully.")
-        except Exception as e:
-            logging.error("Error configuring Gemini API client: %s", str(e))
-            raise RuntimeError(
-                f"Failed to configure Gemini API client: {str(e)}"
-            ) from e
+        genai.configure(api_key=os.environ.get("GCP_API_KEY"))
 
     @staticmethod
+    @handle_firestore_exceptions
     def generate_prompt(prompt, model="gemini-1.5-flash"):
         """
         Generate content using the Gemini API.
@@ -45,13 +38,6 @@ class Gemini:
         Returns:
             str: The generated content.
         """
-        try:
-            gemini_model = genai.GenerativeModel(model)
-            response = gemini_model.generate_content(prompt)
-            return response.text
-        except GoogleAPICallError as e:
-            raise GoogleAPICallError(
-                f"Error generating prompt with Gemini API: {str(e)}"
-            ) from e
-        except Exception as e:
-            raise RuntimeError(f"Unexpected error: {str(e)}") from e
+        gemini_model = genai.GenerativeModel(model)
+        response = gemini_model.generate_content(prompt)
+        return response.text

@@ -309,6 +309,7 @@ class PostDetailScreenState extends State<PostDetailScreen> {
                       const Text('Rate this post:'),
                       const SizedBox(width: 10),
                       DropdownButton<int>(
+                        key: const Key('rateButton'),
                         value: userRating,
                         hint: const Text('Select Rating'),
                         items: [1, 2, 3, 4, 5].map((int value) {

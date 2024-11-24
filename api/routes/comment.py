@@ -72,3 +72,19 @@ def delete_comment(post_id, comment_id):
         return jsonify({"message": f"Error deleting comment: {str(e)}"}), 500
     except RuntimeError as e:
         return handle_runtime_error(e)
+
+@comment_bp.route("/posts/<post_id>/comments/<comment_id>", methods=["PUT"])
+@jwt_required()
+def update_comment(post_id, comment_id):
+    """
+    Update a comment by its ID
+    """
+    try:
+        Comment.update(post_id, comment_id, request.get_json().get("content"))
+        return jsonify({"message": "Comment updated successfully"}), 200
+    except NotFound as e:
+        return jsonify({"message": str(e)}), 404
+    except GoogleAPICallError as e:
+        return jsonify({"message": f"Error updating comment: {str(e)}"}), 500
+    except RuntimeError as e:
+        return handle_runtime_error(e)

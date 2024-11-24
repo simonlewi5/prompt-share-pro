@@ -61,3 +61,17 @@ class Comment:
         if not comment.exists:
             raise NotFound(f"Comment with ID {comment_id} not found.")
         comment_ref.delete()
+
+    @staticmethod
+    @handle_firestore_exceptions
+    def update(post_id, comment_id, content):
+        """
+        Update a comment by its ID on a specific post
+        """
+        post = get_document_or_raise("posts", post_id)
+        comment_ref = post.reference.collection("comments").document(comment_id)
+        comment = comment_ref.get()
+        if not comment.exists:
+            raise NotFound(f"Comment with ID {comment_id} not found.")
+        comment_ref.update({"content": content})
+        return comment_ref.id

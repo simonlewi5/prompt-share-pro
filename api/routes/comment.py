@@ -88,3 +88,4 @@ def update_comment(post_id, comment_id):
         return jsonify({"message": f"Error updating comment: {str(e)}"}), 500
     except RuntimeError as e:
         return handle_runtime_error(e)
+    

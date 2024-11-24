@@ -55,12 +55,9 @@ class Comment:
             GoogleAPICallError: if Firestore error occurs
             Exception: if unexpected error occurs
         """
-<<<<<<< HEAD
         post = get_document_or_raise("posts", post_id)
         comment_ref = post.reference.collection("comments").document(comment_id)
         comment = comment_ref.get()
         if not comment.exists:
             raise NotFound(f"Comment with ID {comment_id} not found.")
         comment_ref.delete()
-=======
->>>>>>> c6631f8 (update comment endpoint)
